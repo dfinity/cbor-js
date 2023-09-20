@@ -1,0 +1,40 @@
+{
+  "name": "@dfinity/cbor",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "vite build && tsc --emitDeclarationOnly",
+    "test": "vitest run --run",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
+    "bench": "vitest bench --run"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/cbor.umd.js",
+  "module": "./dist/cbor.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/cbor.mjs",
+      "require": "./dist/cbor.umd.js",
+      "types": {
+        "default": "./dist/index.d.ts"
+      }
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "borc": "^3.0.0",
+    "cbor-x": "^1.5.4",
+    "simple-cbor": "^0.4.1",
+    "typescript": "^5.2.2",
+    "vite": "^4.5.0",
+    "vite-plugin-checker": "^0.6.2",
+    "vitest": "0.34.6"
+  }
+}
