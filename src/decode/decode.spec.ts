@@ -1,6 +1,7 @@
 import { it, describe, expect } from 'vitest';
 import { decode } from './decode';
 import { CborValue } from '../cbor-value';
+import { Principal } from '@dfinity/principal';
 
 export function hexArrayToArrayBuffer(hexArray: string[]): ArrayBuffer {
   const uint8Array = new Uint8Array(hexArray.map((byte) => parseInt(byte, 16)));
@@ -168,4 +169,20 @@ describe('decode', () => {
 
     expect(result).toEqual(expected);
   });
+  it.only('asdf', () => {
+    decode<Principal>(
+      new Uint8Array(hexStringToArrayBuffer('d9d9f74a00000000000000000101')),
+      {
+        decoders: [
+          {
+            tag: 6,
+            matcher: () => true,
+            decoder: (value: Uint8Array) => Principal.fromUint8Array(value),
+          },
+        ],
+      }
+    )?.toString(); //?
+  });
 });
+
+

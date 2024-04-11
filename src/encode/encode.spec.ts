@@ -1,4 +1,5 @@
 import { it, describe, expect } from 'vitest';
+import { Principal } from '@dfinity/principal';
 import { encode } from './encode';
 import { CborValue } from '../cbor-value';
 
@@ -176,6 +177,68 @@ describe('encode', () => {
   it('should throw if a negative value cannot fit within 8 bytes', () => {
     const value = -18_446_744_073_709_551_617n;
     const error = 'Value too large to encode: 18446744073709551616';
+
+    expect(() => encode(value)).toThrow(error);
+  });
+
+  describe('should encode a value with a custom encoder', () => {
+    it('should encode a date', () => {
+      const value = new Date(0);
+      const expected = '313937302D30312D30315430303A30303A30302E3030305A';
+
+      const result = encode<Date>(value, {
+        encoders: {
+          Date: (value) =>
+            new Uint8Array(
+              value
+                .toISOString()
+                .split('')
+                .map((char) => char.charCodeAt(0))
+            ),
+        },
+      });
+      expect(arrayBufferToHexString(result)).toEqual(expected);
+    });
+
+    it('should encode a symbol', () => {
+      const value = Symbol('test');
+      const expected = '74657374';
+
+      const result = encode<Symbol>(value, {
+        encoders: {
+          Symbol: (value) => {
+            if (!value.description) {
+              throw new Error('Symbol must have a description');
+            }
+            return new Uint8Array(
+              value.description?.split('')?.map((char) => char.charCodeAt(0))
+            );
+          },
+        },
+      });
+      expect(arrayBufferToHexString(result)).toEqual(expected);
+    });
+  });
+
+  it('should encode a Principal', () => {
+    const value = Principal.fromText('rwlgt-iiaaa-aaaaa-aaaaa-cai');
+    const expected = 'd9d9f74a00000000000000000101';
+    const result = encode<Principal>(value, {
+      encoders: {
+        Principal: (value) => {
+          return encode({
+            name: 'Principal',
+            value: value.toUint8Array(),
+          });
+        },
+      },
+    });
+    expect(arrayBufferToHexString(result)).toEqual(expected);
+  });
+
+  it('should throw if an encoder is not provided for a custom type', () => {
+    const value = Symbol('test');
+    const error = 'No encoder provided for Symbol';
 
     expect(() => encode(value)).toThrow(error);
   });

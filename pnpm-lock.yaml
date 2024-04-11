@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 devDependencies:
+  '@dfinity/principal':
+    specifier: ^1.2.0
+    version: 1.2.0
   '@types/node':
     specifier: ^18.0.0
     version: 18.17.18
@@ -100,6 +103,12 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /@dfinity/principal@1.2.0:
+    resolution: {integrity: sha512-7eurqPDL5ptlTTLMJPeiO75FAumXHsWEWDVQaN6XpA3aZtmofNK4Sb5g5Ne9syeuoCJcW3mFBbbFtFNxggxu+g==}
+    dependencies:
+      '@noble/hashes': 1.4.0
+    dev: true
 
   /@esbuild/android-arm64@0.18.20:
     resolution: {integrity: sha512-Nz4rJcchGDtENV0eMKUNa6L12zz2zBDXuhj/Vjh18zGqB44Bi7MBMSXjgunJgjRhCmKOjnPuZp4Mb6OKqtMHLQ==}
@@ -308,6 +317,11 @@ packages:
 
   /@jridgewell/sourcemap-codec@1.4.15:
     resolution: {integrity: sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==}
+    dev: true
+
+  /@noble/hashes@1.4.0:
+    resolution: {integrity: sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==}
+    engines: {node: '>= 16'}
     dev: true
 
   /@nodelib/fs.scandir@2.1.5:

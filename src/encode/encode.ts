@@ -27,9 +27,37 @@ let targetView = new DataView(target.buffer);
 let bytesOffset = 0;
 let mapEntries: [string, CborValue][] = [];
 
-export function encode(value: CborValue): Uint8Array {
+/**
+ * Options for encoding a CBOR value
+ */
+export type EncodeOptions<T> = {
+  encoders?: Record<string, (value: T) => Uint8Array>;
+};
+
+/**
+ * Encodes a value to a CBOR byte array
+ * @param value - The value to encode
+ * @param options - Optional options object
+ * @param options.encoders - A map of custom encoders for specific types. Encoders must return a Uint8Array padded with the correct CBOR tag.
+ * @returns Uint8Array - The encoded CBOR value
+ */
+export function encode<T>(
+  value: CborValue | T,
+  options?: EncodeOptions<T>
+): Uint8Array {
   bytesOffset = 0;
-  encodeItem(value);
+  if (options?.encoders) {
+    if (value && value.constructor) {
+      const encoder = options.encoders[value.constructor.name];
+      if (encoder) {
+        return encoder(value as T);
+      }
+    }
+  }
+
+  // constrain type to CborValue
+  encodeItem(value as CborValue);
+
   return target.subarray(0, bytesOffset);
 }
 
@@ -69,7 +97,13 @@ function encodeItem(item: CborValue): void {
     return;
   }
 
-  throw new EncodingError(`Unsupported type: ${typeof item}`);
+  throw new EncodingError(
+    `No encoder provided for ${capitalizeFirstLetter(typeof item)}`
+  );
+}
+
+function capitalizeFirstLetter(string: string): string {
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 function encodeArray(items: CborValue[]): void {

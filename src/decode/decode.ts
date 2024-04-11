@@ -22,16 +22,38 @@ let cborBytes = new Uint8Array();
 let dataView = new DataView(cborBytes.buffer);
 let bytesOffset = 0;
 
-export function decode<T extends CborValue>(input: Uint8Array): T {
+type Matcher<T> = (value: T) => boolean;
+type DecoderFunc<T> = (value: Uint8Array) => T;
+type Decoder<T> = {
+  tag: number;
+  matcher: Matcher<T>;
+  decoder: DecoderFunc<T>;
+};
+
+/**
+ * Options decoding a CBOR value
+ * @template T - Types to extend the CBOR decoded values
+ * @property decoders - An array of custom decoders for specific types. Decoders must return a value of type T.
+ * The first element of the tuple is the CBOR tag, the second element is the decoder function.
+ */
+export type DecodeOptions<T> = {
+  decoders?: Decoder<T>[];
+};
+
+export function decode<T = never>(
+  input: Uint8Array,
+  options?: DecodeOptions<T>
+): CborValue | T {
   cborBytes = input;
   dataView = new DataView(cborBytes.buffer);
   bytesOffset = 0;
 
-  return decodeItem();
+  return decodeItem(options?.decoders);
 }
 
-function decodeItem<T extends CborValue>(): T {
+function decodeItem<T>(decoders?: DecodeOptions<T>['decoders']): T {
   const [majorType, info] = decodeNextByte();
+  majorType;
 
   switch (majorType) {
     case CborMajorType.UnsignedInteger:
@@ -57,6 +79,17 @@ function decodeItem<T extends CborValue>(): T {
 
     case CborMajorType.Simple:
       return decodeSimple(info) as T;
+  }
+
+  if (decoders) {
+    for (const { tag, matcher, decoder } of decoders) {
+      tag;
+      if (tag === majorType) {
+        if (matcher(info as T)) {
+          return decoder(cborBytes.subarray(bytesOffset)) as T;
+        }
+      }
+    }
   }
 
   throw new DecodingError('Unsupported major type');
