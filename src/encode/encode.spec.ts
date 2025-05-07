@@ -2,14 +2,14 @@ import { it, describe, expect } from 'vitest';
 import { encode, Replacer } from './encode';
 import { CborValue } from '../cbor-value';
 
-function arrayBufferToHexArray(arrayBuffer: ArrayBuffer): string[] {
-  return Array.from(new Uint8Array(arrayBuffer)).map((byte) =>
+function bytesToHexArray(arrayBuffer: Uint8Array): string[] {
+  return Array.from(arrayBuffer).map((byte) =>
     byte.toString(16).padStart(2, '0').toUpperCase()
   );
 }
 
-function arrayBufferToHexString(arrayBuffer: ArrayBuffer): string {
-  return arrayBufferToHexArray(arrayBuffer).join('');
+function bytesToHexString(arrayBuffer: Uint8Array): string {
+  return bytesToHexArray(arrayBuffer).join('');
 }
 
 describe('encode', () => {
@@ -163,7 +163,7 @@ describe('encode', () => {
   ])('should encode item %#', ({ value, expected }) => {
     const result = encode(value);
 
-    expect(arrayBufferToHexString(result)).toEqual(expected);
+    expect(bytesToHexString(result)).toEqual(expected);
   });
 
   it('should throw if a positive value cannot fit within 8 bytes', () => {
@@ -187,7 +187,7 @@ describe('encode', () => {
         typeof value === 'number' ? value * 2 : value;
       const result = encode(value, replacer);
 
-      expect(arrayBufferToHexString(result)).toEqual('A2616102616204'); // { "a": 2, "b": 4 }
+      expect(bytesToHexString(result)).toEqual('A2616102616204'); // { "a": 2, "b": 4 }
     });
 
     it('should handle null and undefined values', () => {
@@ -195,7 +195,7 @@ describe('encode', () => {
       const replacer: Replacer = (value) => (value === null ? 'null' : value);
       const result = encode(value, replacer);
 
-      expect(arrayBufferToHexString(result)).toEqual('A26161646E756C6C6162F7'); // { "a": "null", "b": undefined }
+      expect(bytesToHexString(result)).toEqual('A26161646E756C6C6162F7'); // { "a": "null", "b": undefined }
     });
 
     it('should handle nested objects', () => {
@@ -204,7 +204,7 @@ describe('encode', () => {
         key === 'b' && typeof value === 'number' ? value + 1 : value;
       const result = encode(value, replacer);
 
-      expect(arrayBufferToHexString(result)).toEqual('A16161A1616204'); // { "a": { "b": 4 } }
+      expect(bytesToHexString(result)).toEqual('A16161A1616204'); // { "a": { "b": 4 } }
     });
 
     it('should handle arrays', () => {
@@ -215,7 +215,7 @@ describe('encode', () => {
           : value;
       const result = encode(value, replacer);
 
-      expect(arrayBufferToHexString(result)).toEqual('83020406'); // [2, 4, 6]
+      expect(bytesToHexString(result)).toEqual('83020406'); // [2, 4, 6]
     });
 
     it('should handle objects with booleans', () => {
@@ -224,7 +224,7 @@ describe('encode', () => {
         typeof value === 'boolean' ? !value : value;
       const result = encode(value, replacer);
 
-      expect(arrayBufferToHexString(result)).toEqual('A26161F56162F4'); // { "a": true, "b": false }
+      expect(bytesToHexString(result)).toEqual('A26161F56162F4'); // { "a": true, "b": false }
     });
   });
 });

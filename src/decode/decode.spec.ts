@@ -2,16 +2,14 @@ import { it, describe, expect } from 'vitest';
 import { decode, Reviver } from './decode';
 import { CborValue } from '../cbor-value';
 
-export function hexArrayToArrayBuffer(hexArray: string[]): ArrayBuffer {
-  const uint8Array = new Uint8Array(hexArray.map((byte) => parseInt(byte, 16)));
-
-  return uint8Array.buffer;
+function hexArrayToBytes(hexArray: string[]): Uint8Array {
+  return new Uint8Array(hexArray.map((byte) => parseInt(byte, 16)));
 }
 
-export function hexStringToArrayBuffer(hexString: string): ArrayBuffer {
+function hexStringToBytes(hexString: string): Uint8Array {
   const hexArray = hexString.match(/.{1,2}/g) || [];
 
-  return hexArrayToArrayBuffer(hexArray);
+  return hexArrayToBytes(hexArray);
 }
 
 describe('decode', () => {
@@ -163,8 +161,7 @@ describe('decode', () => {
     { bytes: '3B0100000000000000', expected: -72_057_594_037_927_937n }, // smallest values in eight bytes
     { bytes: '3BFFFFFFFFFFFFFFFF', expected: -18_446_744_073_709_551_616n }, // largest values in eight bytes
   ])('should decode item %#', ({ bytes, expected }) => {
-    const bytesArray = new Uint8Array(hexStringToArrayBuffer(bytes));
-    const result = decode(bytesArray);
+    const result = decode(hexStringToBytes(bytes));
 
     expect(result).toEqual(expected);
   });
@@ -174,8 +171,7 @@ describe('decode', () => {
       const bytes = 'A2616101616202'; // { "a": 1, "b": 2 }
       const reviver: Reviver = (value) =>
         typeof value === 'number' ? value * 2 : value;
-      const bytesArray = new Uint8Array(hexStringToArrayBuffer(bytes));
-      const result = decode(bytesArray, reviver);
+      const result = decode(hexStringToBytes(bytes), reviver);
 
       expect(result).toEqual({ a: 2, b: 4 });
     });
@@ -183,8 +179,7 @@ describe('decode', () => {
     it('should handle null and undefined values', () => {
       const bytes = 'A26161F66162F7'; // { "a": null, "b": undefined }
       const reviver: Reviver = (value) => (value === null ? 'null' : value);
-      const bytesArray = new Uint8Array(hexStringToArrayBuffer(bytes));
-      const result = decode(bytesArray, reviver);
+      const result = decode(hexStringToBytes(bytes), reviver);
 
       expect(result).toEqual({ a: 'null', b: undefined });
     });
@@ -193,8 +188,7 @@ describe('decode', () => {
       const bytes = 'A16161A1616203'; // { "a": { "b": 3 } }
       const reviver: Reviver = (value, key) =>
         value !== undefined && key === 'b' ? (value as number) + 1 : value;
-      const bytesArray = new Uint8Array(hexStringToArrayBuffer(bytes));
-      const result = decode(bytesArray, reviver);
+      const result = decode(hexStringToBytes(bytes), reviver);
 
       expect(result).toEqual({ a: { b: 4 } });
     });
@@ -203,8 +197,7 @@ describe('decode', () => {
       const bytes = '83010203'; // [1, 2, 3]
       const reviver: Reviver = (value) =>
         Array.isArray(value) ? value.map((v) => (v as number) * 2) : value;
-      const bytesArray = new Uint8Array(hexStringToArrayBuffer(bytes));
-      const result = decode(bytesArray, reviver);
+      const result = decode(hexStringToBytes(bytes), reviver);
 
       expect(result).toEqual([2, 4, 6]);
     });
@@ -213,8 +206,7 @@ describe('decode', () => {
       const bytes = 'A26161F46162F5'; // { "a": false, "b": true }
       const reviver: Reviver = (value) =>
         typeof value === 'boolean' ? !value : value;
-      const bytesArray = new Uint8Array(hexStringToArrayBuffer(bytes));
-      const result = decode(bytesArray, reviver);
+      const result = decode(hexStringToBytes(bytes), reviver);
 
       expect(result).toEqual({ a: true, b: false });
     });
