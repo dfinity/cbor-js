@@ -1,5 +1,5 @@
 import { it, describe, expect } from 'vitest';
-import { decode } from './decode';
+import { decode, Reviver } from './decode';
 import { CborValue } from '../cbor-value';
 
 export function hexArrayToArrayBuffer(hexArray: string[]): ArrayBuffer {
@@ -167,5 +167,56 @@ describe('decode', () => {
     const result = decode(bytesArray);
 
     expect(result).toEqual(expected);
+  });
+
+  describe('decode with reviver', () => {
+    it('should handle objects', () => {
+      const bytes = 'A2616101616202'; // { "a": 1, "b": 2 }
+      const reviver: Reviver = (value) =>
+        typeof value === 'number' ? value * 2 : value;
+      const bytesArray = new Uint8Array(hexStringToArrayBuffer(bytes));
+      const result = decode(bytesArray, reviver);
+
+      expect(result).toEqual({ a: 2, b: 4 });
+    });
+
+    it('should handle null and undefined values', () => {
+      const bytes = 'A26161F66162F7'; // { "a": null, "b": undefined }
+      const reviver: Reviver = (value) => (value === null ? 'null' : value);
+      const bytesArray = new Uint8Array(hexStringToArrayBuffer(bytes));
+      const result = decode(bytesArray, reviver);
+
+      expect(result).toEqual({ a: 'null', b: undefined });
+    });
+
+    it('should handle nested objects', () => {
+      const bytes = 'A16161A1616203'; // { "a": { "b": 3 } }
+      const reviver: Reviver = (value, key) =>
+        value !== undefined && key === 'b' ? (value as number) + 1 : value;
+      const bytesArray = new Uint8Array(hexStringToArrayBuffer(bytes));
+      const result = decode(bytesArray, reviver);
+
+      expect(result).toEqual({ a: { b: 4 } });
+    });
+
+    it('should handle arrays', () => {
+      const bytes = '83010203'; // [1, 2, 3]
+      const reviver: Reviver = (value) =>
+        Array.isArray(value) ? value.map((v) => (v as number) * 2) : value;
+      const bytesArray = new Uint8Array(hexStringToArrayBuffer(bytes));
+      const result = decode(bytesArray, reviver);
+
+      expect(result).toEqual([2, 4, 6]);
+    });
+
+    it('should handle objects with booleans', () => {
+      const bytes = 'A26161F46162F5'; // { "a": false, "b": true }
+      const reviver: Reviver = (value) =>
+        typeof value === 'boolean' ? !value : value;
+      const bytesArray = new Uint8Array(hexStringToArrayBuffer(bytes));
+      const result = decode(bytesArray, reviver);
+
+      expect(result).toEqual({ a: true, b: false });
+    });
   });
 });

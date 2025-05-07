@@ -22,41 +22,51 @@ let cborBytes = new Uint8Array();
 let dataView = new DataView(cborBytes.buffer);
 let bytesOffset = 0;
 
-export function decode<T extends CborValue>(input: Uint8Array): T {
+export type Reviver<K extends CborValue = CborValue> = (
+  value: K,
+  key?: K extends CborValue ? string : keyof K
+) => [K] extends [never] ? CborValue : K;
+
+export function decode<T extends CborValue = CborValue>(
+  input: Uint8Array,
+  reviver?: Reviver<T>
+): T {
   cborBytes = input;
   dataView = new DataView(cborBytes.buffer);
   bytesOffset = 0;
 
-  return decodeItem();
+  const decodedItem = decodeItem(reviver as Reviver | undefined) as T;
+  return (reviver?.(decodedItem as T) ?? decodedItem) as T;
 }
 
-function decodeItem<T extends CborValue>(): T {
+function decodeItem(reviver?: Reviver): CborValue {
   const [majorType, info] = decodeNextByte();
 
   switch (majorType) {
     case CborMajorType.UnsignedInteger:
-      return decodeUnsignedInteger(info) as T;
+      return decodeUnsignedInteger(info);
 
     case CborMajorType.NegativeInteger:
-      return decodeNegativeInteger(info) as T;
+      return decodeNegativeInteger(info);
 
     case CborMajorType.ByteString:
-      return decodeByteString(info) as T;
+      return decodeByteString(info);
 
     case CborMajorType.TextString:
-      return decodeTextString(info) as T;
+      return decodeTextString(info);
 
     case CborMajorType.Array:
-      return decodeArray(info) as T;
+      return decodeArray(info, reviver);
 
     case CborMajorType.Map:
-      return decodeMap(info) as T;
+      return decodeMap(info, reviver);
 
+    // custom tags purposefully not implemented
     // case CborMajorType.Tag:
-    //   return decodeTag(info) as T;
+    //   return decodeTag(info);
 
     case CborMajorType.Simple:
-      return decodeSimple(info) as T;
+      return decodeSimple(info);
   }
 
   throw new DecodingError('Unsupported major type');
@@ -75,12 +85,13 @@ function decodeNextByte(): [CborMajorType, number] {
   return [majorType, info];
 }
 
-function decodeArray(info: number): CborValue[] {
+function decodeArray(info: number, reviver?: Reviver): CborValue[] {
   const arrayLength = decodeUnsignedInteger(info);
 
   const values = new Array<CborValue>(arrayLength);
   for (let i = 0; i < arrayLength; i++) {
-    values[i] = decodeItem();
+    const decodedItem = decodeItem(reviver);
+    values[i] = reviver?.(decodedItem) ?? decodedItem;
   }
 
   return values;
@@ -105,7 +116,7 @@ function decodeSimple(info: number): CborSimple {
   throw new DecodingError(`Unrecognized simple type: ${info.toString(2)}`);
 }
 
-function decodeMap(info: number): CborMap {
+function decodeMap(info: number, reviver?: Reviver): CborMap {
   const mapLength = decodeUnsignedInteger(info);
 
   const map: CborMap = {};
@@ -117,7 +128,8 @@ function decodeMap(info: number): CborMap {
     }
 
     const key = decodeTextString(info);
-    map[key] = decodeItem();
+    const decodedItem = decodeItem(reviver);
+    map[key] = reviver?.(decodedItem, key) ?? decodedItem;
   }
 
   return map;

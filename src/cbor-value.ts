@@ -1,10 +1,11 @@
-export type CborValue =
+export type CborValue<T = never> =
   | CborNumber
   | string
   | Uint8Array
-  | CborValue[]
-  | CborMap
-  | CborSimple;
+  | CborValue<T>[]
+  | CborMap<T>
+  | CborSimple
+  | T;
 
 export type CborNumber = number | bigint;
 
@@ -17,9 +18,9 @@ export enum CborSimpleType {
   Undefined = 0x17,
 }
 
-export type CborMap = {
-  [key: string | number | symbol]: CborValue;
-};
+export interface CborMap<T = never> {
+  [key: string | number | symbol]: CborValue<T>;
+}
 
 export enum CborMajorType {
   UnsignedInteger = 0,
