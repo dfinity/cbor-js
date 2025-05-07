@@ -27,13 +27,24 @@ let targetView = new DataView(target.buffer);
 let bytesOffset = 0;
 let mapEntries: [string, CborValue][] = [];
 
-export function encode(value: CborValue): Uint8Array {
+export type Replacer<K = never> = (
+  value: CborValue<K>,
+  key?: [K] extends [never] ? string : keyof CborValue<K>
+) => CborValue;
+
+export function encode<T>(
+  value: CborValue<T>,
+  replacer?: Replacer<T>
+): Uint8Array {
   bytesOffset = 0;
-  encodeItem(value);
+
+  const transformedValue = replacer?.(value) ?? value;
+  encodeItem(transformedValue as CborValue, replacer);
+
   return target.subarray(0, bytesOffset);
 }
 
-function encodeItem(item: CborValue): void {
+function encodeItem(item: CborValue, replacer?: Replacer): void {
   if (bytesOffset > target.length - SAFE_BUFFER_END_OFFSET) {
     target = resizeUint8Array(target, target.length * 2);
     targetView = new DataView(target.buffer);
@@ -60,34 +71,34 @@ function encodeItem(item: CborValue): void {
   }
 
   if (Array.isArray(item)) {
-    encodeArray(item);
+    encodeArray(item, replacer);
     return;
   }
 
   if (typeof item === 'object') {
-    encodeMap(item);
+    encodeMap(item, replacer);
     return;
   }
 
   throw new EncodingError(`Unsupported type: ${typeof item}`);
 }
 
-function encodeArray(items: CborValue[]): void {
+function encodeArray(items: CborValue[], replacer?: Replacer): void {
   encodeHeader(CborMajorType.Array, items.length);
 
-  items.forEach((item) => {
-    encodeItem(item);
+  items.forEach((item, i) => {
+    encodeItem(replacer?.(item, i.toString()) ?? item, replacer);
   });
 }
 
-function encodeMap(map: CborMap): void {
+function encodeMap(map: CborMap, replacer?: Replacer): void {
   mapEntries = Object.entries(map);
 
   encodeHeader(CborMajorType.Map, mapEntries.length);
 
   mapEntries.forEach(([key, value]) => {
-    encodeItem(key);
-    encodeItem(value);
+    encodeTextString(key);
+    encodeItem(replacer?.(value, key) ?? value, replacer);
   });
 }
 

@@ -1,5 +1,5 @@
 import { it, describe, expect } from 'vitest';
-import { encode } from './encode';
+import { encode, Replacer } from './encode';
 import { CborValue } from '../cbor-value';
 
 function arrayBufferToHexArray(arrayBuffer: ArrayBuffer): string[] {
@@ -178,5 +178,53 @@ describe('encode', () => {
     const error = 'Value too large to encode: 18446744073709551616';
 
     expect(() => encode(value)).toThrow(error);
+  });
+
+  describe('encode with replacer', () => {
+    it('should handle objects', () => {
+      const value = { a: 1, b: 2 };
+      const replacer: Replacer = (value) =>
+        typeof value === 'number' ? value * 2 : value;
+      const result = encode(value, replacer);
+
+      expect(arrayBufferToHexString(result)).toEqual('A2616102616204'); // { "a": 2, "b": 4 }
+    });
+
+    it('should handle null and undefined values', () => {
+      const value = { a: null, b: undefined };
+      const replacer: Replacer = (value) => (value === null ? 'null' : value);
+      const result = encode(value, replacer);
+
+      expect(arrayBufferToHexString(result)).toEqual('A26161646E756C6C6162F7'); // { "a": "null", "b": undefined }
+    });
+
+    it('should handle nested objects', () => {
+      const value = { a: { b: 3 } };
+      const replacer: Replacer = (value, key) =>
+        key === 'b' && typeof value === 'number' ? value + 1 : value;
+      const result = encode(value, replacer);
+
+      expect(arrayBufferToHexString(result)).toEqual('A16161A1616204'); // { "a": { "b": 4 } }
+    });
+
+    it('should handle arrays', () => {
+      const value = [1, 2, 3];
+      const replacer: Replacer = (value) =>
+        Array.isArray(value)
+          ? value.map((v) => (typeof v === 'number' ? v * 2 : v))
+          : value;
+      const result = encode(value, replacer);
+
+      expect(arrayBufferToHexString(result)).toEqual('83020406'); // [2, 4, 6]
+    });
+
+    it('should handle objects with booleans', () => {
+      const value = { a: false, b: true };
+      const replacer: Replacer = (value) =>
+        typeof value === 'boolean' ? !value : value;
+      const result = encode(value, replacer);
+
+      expect(arrayBufferToHexString(result)).toEqual('A26161F56162F4'); // { "a": true, "b": false }
+    });
   });
 });
