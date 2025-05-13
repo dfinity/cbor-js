@@ -1,11 +1,15 @@
-export type CborValue<T = never> =
+export type CborValue<T = any> = ReplacedCborValue<T> | T;
+
+export type ReplacedCborValue<T = any> =
   | CborNumber
   | string
+  | ArrayBuffer
   | Uint8Array
   | CborValue<T>[]
   | CborMap<T>
-  | CborSimple
-  | T;
+  | CborSimple;
+
+export const CBOR_MAGIC_TAG = 55799;
 
 export type CborNumber = number | bigint;
 
@@ -16,11 +20,22 @@ export enum CborSimpleType {
   True = 0x15,
   Null = 0x16,
   Undefined = 0x17,
+  Break = 0x1F,
 }
 
-export interface CborMap<T = never> {
-  [key: string | number | symbol]: CborValue<T>;
-}
+export type CborMap<T = any> =
+  | {
+      [key: string]: CborValue<T>;
+    }
+  | {
+      [key: string | number]: CborValue<T>;
+    }
+  | {
+      [key: string | symbol]: CborValue<T>;
+    }
+  | {
+      [key: string | number | symbol]: CborValue<T>;
+    };
 
 export enum CborMajorType {
   UnsignedInteger = 0,

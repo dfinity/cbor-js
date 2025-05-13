@@ -1,4 +1,5 @@
 import {
+  CBOR_MAGIC_TAG,
   CborMajorType,
   CborMap,
   CborMinorType,
@@ -9,6 +10,8 @@ import {
 } from '../cbor-value';
 import { IS_LITTLE_ENDIAN, isNil } from '../util';
 import { DecodingError } from './decoding-error';
+
+const textDecoder = new TextDecoder();
 
 function decodeMajorType(firstByte: number): CborMajorType {
   return (firstByte & 0b1110_0000) >> 5;
@@ -61,15 +64,14 @@ function decodeItem(reviver?: Reviver): CborValue {
     case CborMajorType.Map:
       return decodeMap(info, reviver);
 
-    // custom tags purposefully not implemented
-    // case CborMajorType.Tag:
-    //   return decodeTag(info);
+    case CborMajorType.Tag:
+      return decodeTag(info, reviver);
 
     case CborMajorType.Simple:
       return decodeSimple(info);
   }
 
-  throw new DecodingError('Unsupported major type');
+  throw new DecodingError(`Unsupported major type: ${majorType}`);
 }
 
 function decodeNextByte(): [CborMajorType, number] {
@@ -87,8 +89,19 @@ function decodeNextByte(): [CborMajorType, number] {
 
 function decodeArray(info: number, reviver?: Reviver): CborValue[] {
   const arrayLength = decodeUnsignedInteger(info);
-
   const values = new Array<CborValue>(arrayLength);
+
+  if (arrayLength === Infinity) {
+    let decodedItem = decodeItem(reviver);
+
+    while (decodedItem !== undefined) {
+      values.push(reviver?.(decodedItem) ?? decodedItem);
+      decodedItem = decodeItem(reviver);
+    }
+
+    return values;
+  }
+
   for (let i = 0; i < arrayLength; i++) {
     const decodedItem = decodeItem(reviver);
     values[i] = reviver?.(decodedItem) ?? decodedItem;
@@ -108,7 +121,8 @@ function decodeSimple(info: number): CborSimple {
     case CborSimpleType.Null: {
       return null;
     }
-    case CborSimpleType.Undefined: {
+    case CborSimpleType.Undefined:
+    case CborSimpleType.Break: {
       return undefined;
     }
   }
@@ -118,8 +132,25 @@ function decodeSimple(info: number): CborSimple {
 
 function decodeMap(info: number, reviver?: Reviver): CborMap {
   const mapLength = decodeUnsignedInteger(info);
-
   const map: CborMap = {};
+
+  if (mapLength === Infinity) {
+    let [majorType, info] = decodeNextByte();
+
+    while (
+      majorType !== CborMajorType.Simple &&
+      info !== CborSimpleType.Break
+    ) {
+      const key = decodeTextString(info);
+      const decodedItem = decodeItem(reviver);
+      map[key] = reviver?.(decodedItem, key) ?? decodedItem;
+
+      [majorType, info] = decodeNextByte();
+    }
+
+    return map;
+  }
+
   for (let i = 0; i < mapLength; i++) {
     const [majorType, info] = decodeNextByte();
 
@@ -158,6 +189,9 @@ function decodeUnsignedInteger(info: number): CborNumber {
       bytesOffset += 8;
       return dataView.getBigUint64(0, IS_LITTLE_ENDIAN);
 
+    case CborMinorType.Indefinite:
+      return Infinity;
+
     default:
       throw new DecodingError(`Unsupported integer info: ${info.toString(2)}`);
   }
@@ -178,11 +212,21 @@ function decodeByteString(info: number): Uint8Array {
 
   const safeByteLength = Number(byteLength);
   bytesOffset += safeByteLength;
-  return cborBytes.subarray(bytesOffset - safeByteLength, bytesOffset);
+  return cborBytes.slice(bytesOffset - safeByteLength, bytesOffset);
 }
 
 function decodeTextString(info: number): string {
   const bytes = decodeByteString(info);
 
-  return new TextDecoder().decode(bytes);
+  return textDecoder.decode(bytes);
+}
+
+function decodeTag(info: number, reviver?: Reviver): CborValue {
+  const value = decodeUnsignedInteger(info);
+
+  if (value === CBOR_MAGIC_TAG) {
+    return decodeItem(reviver);
+  }
+
+  throw new DecodingError(`Unsupported tag: ${value}.`);
 }
