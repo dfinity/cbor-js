@@ -228,7 +228,7 @@ describe('encode', () => {
     });
   });
 
-  it('should handle parallel encode calls correctly', async () => {
+  it('should encode concurrently', async () => {
     const values = [
       { a: 1, b: 2 },
       { c: 3, d: 4 },

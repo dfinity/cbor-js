@@ -9,7 +9,7 @@ export type ReplacedCborValue<T = any> =
   | CborMap<T>
   | CborSimple;
 
-export const CBOR_MAGIC_TAG = 55799;
+export const CBOR_SELF_DESCRIBED_TAG = 55799;
 
 export type CborNumber = number | bigint;
 

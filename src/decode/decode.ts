@@ -1,5 +1,5 @@
 import {
-  CBOR_MAGIC_TAG,
+  CBOR_SELF_DESCRIBED_TAG,
   CborMajorType,
   CborMap,
   CborMinorType,
@@ -89,9 +89,9 @@ function decodeNextByte(): [CborMajorType, number] {
 
 function decodeArray(info: number, reviver?: Reviver): CborValue[] {
   const arrayLength = decodeUnsignedInteger(info);
-  const values = new Array<CborValue>(arrayLength);
 
   if (arrayLength === Infinity) {
+    const values: CborValue[] = [];
     let decodedItem = decodeItem(reviver);
 
     while (decodedItem !== undefined) {
@@ -102,11 +102,11 @@ function decodeArray(info: number, reviver?: Reviver): CborValue[] {
     return values;
   }
 
+  const values = new Array<CborValue>(arrayLength);
   for (let i = 0; i < arrayLength; i++) {
     const decodedItem = decodeItem(reviver);
     values[i] = reviver?.(decodedItem) ?? decodedItem;
   }
-
   return values;
 }
 
@@ -224,7 +224,7 @@ function decodeTextString(info: number): string {
 function decodeTag(info: number, reviver?: Reviver): CborValue {
   const value = decodeUnsignedInteger(info);
 
-  if (value === CBOR_MAGIC_TAG) {
+  if (value === CBOR_SELF_DESCRIBED_TAG) {
     return decodeItem(reviver);
   }
 

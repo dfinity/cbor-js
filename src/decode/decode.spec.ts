@@ -29,20 +29,39 @@ describe('decode', () => {
 
     { bytes: '80', expected: [] }, // empty array
     { bytes: 'D9D9F780', expected: [] }, // self-described empty array
+    { bytes: '9FFF', expected: [] }, // indeterminate length empty array
+    { bytes: 'D9D9F79FFF', expected: [] }, // self-described indeterminate length empty array
+
     { bytes: '83010203', expected: [1, 2, 3] }, // array of numbers
     { bytes: 'D9D9F783010203', expected: [1, 2, 3] }, // self-described array of numbers
+    { bytes: '9F010203FF', expected: [1, 2, 3] }, // indeterminate length array of numbers
+    { bytes: 'D9D9F79F010203FF', expected: [1, 2, 3] }, // self-described indeterminate length array of numbers
+
     { bytes: '826161A161626163', expected: ['a', { b: 'c' }] }, // array of strings and objects
     { bytes: 'D9D9F7826161A161626163', expected: ['a', { b: 'c' }] }, // self-described array of strings and objects
+    { bytes: '9F6161A161626163FF', expected: ['a', { b: 'c' }] }, // indeterminate length array of strings and objects
+    { bytes: 'D9D9F79F6161A161626163FF', expected: ['a', { b: 'c' }] }, // self-described indeterminate length array of strings and objects
+
     { bytes: '8301820203820405', expected: [1, [2, 3], [4, 5]] }, // nested arrays
     { bytes: 'D9D9F78301820203820405', expected: [1, [2, 3], [4, 5]] }, // self-described nested arrays
+    { bytes: '9F01820203820405FF', expected: [1, [2, 3], [4, 5]] }, // indeterminate length nested arrays
+    { bytes: 'D9D9F79F01820203820405FF', expected: [1, [2, 3], [4, 5]] }, // self-described indeterminate length nested arrays
+
     { bytes: '8561616162616361646165', expected: ['a', 'b', 'c', 'd', 'e'] }, // array of strings
-    // self-described array of strings
     {
+      // self-described array of strings
       bytes: 'D9D9F78561616162616361646165',
       expected: ['a', 'b', 'c', 'd', 'e'],
     },
-    // array of big ints
+    { bytes: '9F61616162616361646165FF', expected: ['a', 'b', 'c', 'd', 'e'] }, // indeterminate length array of strings
     {
+      // self-described indeterminate length array of strings
+      bytes: 'D9D9F79F61616162616361646165FF',
+      expected: ['a', 'b', 'c', 'd', 'e'],
+    },
+
+    {
+      // array of big ints
       bytes: '831B00FFFFFFFFFFFFFF1B01000000000000001BFFFFFFFFFFFFFFFF',
       expected: [
         BigInt('72057594037927935'),
@@ -50,8 +69,8 @@ describe('decode', () => {
         BigInt('18446744073709551615'),
       ],
     },
-    // self-described array of big ints
     {
+      // self-described array of big ints
       bytes: 'D9D9F7831B00FFFFFFFFFFFFFF1B01000000000000001BFFFFFFFFFFFFFFFF',
       expected: [
         BigInt('72057594037927935'),
@@ -59,22 +78,58 @@ describe('decode', () => {
         BigInt('18446744073709551615'),
       ],
     },
-    // large array of numbers
     {
+      // indeterminate length array of big ints
+      bytes: '9F1B00FFFFFFFFFFFFFF1B01000000000000001BFFFFFFFFFFFFFFFFFF',
+      expected: [
+        BigInt('72057594037927935'),
+        BigInt('72057594037927936'),
+        BigInt('18446744073709551615'),
+      ],
+    },
+    {
+      // self-described indeterminate length array of big ints
+      bytes: 'D9D9F79F1B00FFFFFFFFFFFFFF1B01000000000000001BFFFFFFFFFFFFFFFFFF',
+      expected: [
+        BigInt('72057594037927935'),
+        BigInt('72057594037927936'),
+        BigInt('18446744073709551615'),
+      ],
+    },
+
+    {
+      // large array of numbers
       bytes: '98190102030405060708090A0B0C0D0E0F101112131415161718181819',
       expected: [
         1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
         21, 22, 23, 24, 25,
       ],
     },
-    // self-described large array of numbers
     {
+      // self-described large array of numbers
       bytes: 'D9D9F798190102030405060708090A0B0C0D0E0F101112131415161718181819',
       expected: [
         1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
         21, 22, 23, 24, 25,
       ],
     },
+    {
+      // indeterminate length large array of numbers
+      bytes: '9F0102030405060708090A0B0C0D0E0F101112131415161718181819FF',
+      expected: [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+        21, 22, 23, 24, 25,
+      ],
+    },
+    {
+      // self-described indeterminate length large array of numbers
+      bytes: 'D9D9F79F0102030405060708090A0B0C0D0E0F101112131415161718181819FF',
+      expected: [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+        21, 22, 23, 24, 25,
+      ],
+    },
+
     {
       // one byte length array
       bytes: `9818${new Array(24).fill('6161').join('')}`,
@@ -86,6 +141,17 @@ describe('decode', () => {
       expected: new Array(24).fill('a'),
     },
     {
+      // indeterminate length one byte array
+      bytes: `9F${new Array(24).fill('6161').join('')}FF`,
+      expected: new Array(24).fill('a'),
+    },
+    {
+      // self-described indeterminate length one byte array
+      bytes: `D9D9F79F${new Array(24).fill('6161').join('')}FF`,
+      expected: new Array(24).fill('a'),
+    },
+
+    {
       // self-described two byte length array
       bytes: `990100${new Array(256).fill('6161').join('')}`,
       expected: new Array(256).fill('a'),
@@ -96,13 +162,34 @@ describe('decode', () => {
       expected: new Array(256).fill('a'),
     },
     {
+      // indeterminate length two byte array
+      bytes: `9F${new Array(256).fill('6161').join('')}FF`,
+      expected: new Array(256).fill('a'),
+    },
+    {
+      // self-described indeterminate length two byte array
+      bytes: `D9D9F79F${new Array(256).fill('6161').join('')}FF`,
+      expected: new Array(256).fill('a'),
+    },
+
+    {
       // self-described three byte length array
       bytes: `9A00010000${new Array(65_536).fill('6161').join('')}`,
       expected: new Array(65_536).fill('a'),
     },
     {
-      // tself-described hree byte length array
+      // tself-described three byte length array
       bytes: `D9D9F79A00010000${new Array(65_536).fill('6161').join('')}`,
+      expected: new Array(65_536).fill('a'),
+    },
+    {
+      // indeterminate length three byte array
+      bytes: `9F${new Array(65_536).fill('6161').join('')}FF`,
+      expected: new Array(65_536).fill('a'),
+    },
+    {
+      // self-described indeterminate length three byte array
+      bytes: `D9D9F79F${new Array(65_536).fill('6161').join('')}FF`,
       expected: new Array(65_536).fill('a'),
     },
 
@@ -110,18 +197,37 @@ describe('decode', () => {
 
     { bytes: 'A0', expected: {} }, // empty map
     { bytes: 'D9D9F7A0', expected: {} }, // self-described empty map
+    { bytes: 'BFFF', expected: {} }, // indeterminate length empty map
+    { bytes: 'D9D9F7BFFF', expected: {} }, // self-described indeterminate length empty map
+
     { bytes: 'A2613102613304', expected: { 1: 2, 3: 4 } }, // map of numbers
     { bytes: 'D9D9F7A2613102613304', expected: { 1: 2, 3: 4 } }, // self-described map of numbers
+    { bytes: 'BF613102613304FF', expected: { 1: 2, 3: 4 } }, // indeterminate length map of numbers
+    { bytes: 'D9D9F7BF613102613304FF', expected: { 1: 2, 3: 4 } }, // self-described indeterminate length map of numbers
+
     { bytes: 'A26161016162820203', expected: { a: 1, b: [2, 3] } }, // map of numbers and arrays
     { bytes: 'D9D9F7A26161016162820203', expected: { a: 1, b: [2, 3] } }, // self-described map of numbers and arrays
-    // large map of strings
+    { bytes: 'BF6161016162820203FF', expected: { a: 1, b: [2, 3] } }, // indeterminate length map of numbers and arrays
+    { bytes: 'D9D9F7BF6161016162820203FF', expected: { a: 1, b: [2, 3] } }, // self-described indeterminate length map of numbers and arrays
+
     {
+      // large map of strings
       bytes: 'A56161614161626142616361436164614461656145',
       expected: { a: 'A', b: 'B', c: 'C', d: 'D', e: 'E' },
     },
-    // self-described large map of strings
     {
+      // self-described large map of strings
       bytes: 'D9D9F7A56161614161626142616361436164614461656145',
+      expected: { a: 'A', b: 'B', c: 'C', d: 'D', e: 'E' },
+    },
+    {
+      // indeterminate length large map of strings
+      bytes: 'BF6161614161626142616361436164614461656145FF',
+      expected: { a: 'A', b: 'B', c: 'C', d: 'D', e: 'E' },
+    },
+    {
+      // self-described indeterminate length large map of strings
+      bytes: 'D9D9F7BF6161614161626142616361436164614461656145FF',
       expected: { a: 'A', b: 'B', c: 'C', d: 'D', e: 'E' },
     },
 
@@ -141,23 +247,23 @@ describe('decode', () => {
     { bytes: 'D9D9F764F0908591', expected: '\ud800\udd51' }, // self-described string with surrogate pair
     { bytes: '6C48656C6C6F20576F726C6421', expected: 'Hello World!' }, // string with ASCII characters
     { bytes: 'D9D9F76C48656C6C6F20576F726C6421', expected: 'Hello World!' }, // self-described string with ASCII characters
-    // datetime
     {
+      // datetime
       bytes: '74323031332D30332D32315432303A30343A30305A',
       expected: '2013-03-21T20:04:00Z',
     },
-    // self-described datetime
     {
+      // self-described datetime
       bytes: 'D9D9F774323031332D30332D32315432303A30343A30305A',
       expected: '2013-03-21T20:04:00Z',
     },
-    // website URL
     {
+      // website URL
       bytes: '76687474703A2F2F7777772E6578616D706C652E636F6D',
       expected: 'http://www.example.com',
     },
-    // self-described website URL
     {
+      // self-described website URL
       bytes: 'D9D9F776687474703A2F2F7777772E6578616D706C652E636F6D',
       expected: 'http://www.example.com',
     },
@@ -251,8 +357,8 @@ describe('decode', () => {
     { bytes: '1B0100000000000000', expected: 72_057_594_037_927_936n }, // smallest values in eight bytes
     { bytes: 'D9D9F71B0100000000000000', expected: 72_057_594_037_927_936n }, // self-described smallest values in eight bytes
     { bytes: '1BFFFFFFFFFFFFFFFF', expected: 18_446_744_073_709_551_615n }, // largest values in eight bytes
-    // self-described largest values in eight bytes
     {
+      // self-described largest values in eight bytes
       bytes: 'D9D9F71BFFFFFFFFFFFFFFFF',
       expected: 18_446_744_073_709_551_615n,
     },
@@ -306,8 +412,8 @@ describe('decode', () => {
     { bytes: '3B0100000000000000', expected: -72_057_594_037_927_937n }, // smallest values in eight bytes
     { bytes: 'D9D9F73B0100000000000000', expected: -72_057_594_037_927_937n }, // self-described smallest values in eight bytes
     { bytes: '3BFFFFFFFFFFFFFFFF', expected: -18_446_744_073_709_551_616n }, // largest values in eight bytes
-    // self-described largest values in eight bytes
     {
+      // self-described largest values in eight bytes
       bytes: 'D9D9F73BFFFFFFFFFFFFFFFF',
       expected: -18_446_744_073_709_551_616n,
     },
@@ -405,5 +511,21 @@ describe('decode', () => {
 
       expect(result).toEqual({ a: true, b: false });
     });
+  });
+
+  it('should decode concurrently', async () => {
+    const values = [
+      'A2616101616202', // { "a": 1, "b": 2 }
+      'A2616303616404', // { "c": 3, "d": 4 }
+      'A2616505616606', // { "e": 5, "f": 6 }
+    ];
+
+    const results = await Promise.all(
+      values.map((value) => decode(hexStringToBytes(value)))
+    );
+
+    expect(results[0]).toEqual({ a: 1, b: 2 });
+    expect(results[1]).toEqual({ c: 3, d: 4 });
+    expect(results[2]).toEqual({ e: 5, f: 6 });
   });
 });
