@@ -44,7 +44,7 @@ export function encode<T = any>(
   const transformedValue = replacer?.(value) ?? value;
   encodeItem(transformedValue, replacer);
 
-  return target.subarray(0, bytesOffset).slice();
+  return target.slice(0, bytesOffset);
 }
 
 function encodeItem(item: CborValue, replacer?: Replacer): void {
