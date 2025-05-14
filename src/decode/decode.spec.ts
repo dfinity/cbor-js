@@ -61,6 +61,67 @@ describe('decode', () => {
     },
 
     {
+      // kitchen sink array
+      bytes: '89016161F7A261610161326162F48301616203F5F6836161026163',
+      expected: [
+        1,
+        'a',
+        undefined,
+        { a: 1, '2': 'b' },
+        false,
+        [1, 'b', 3],
+        true,
+        null,
+        ['a', 2, 'c'],
+      ],
+    },
+    {
+      // self-described kitchen sink array
+      bytes: 'D9D9F789016161F7A261610161326162F48301616203F5F6836161026163',
+      expected: [
+        1,
+        'a',
+        undefined,
+        { a: 1, '2': 'b' },
+        false,
+        [1, 'b', 3],
+        true,
+        null,
+        ['a', 2, 'c'],
+      ],
+    },
+    {
+      // indeterminate length kitchen sink array
+      bytes: '9F016161F7A261610161326162F48301616203F5F6836161026163FF',
+      expected: [
+        1,
+        'a',
+        undefined,
+        { a: 1, '2': 'b' },
+        false,
+        [1, 'b', 3],
+        true,
+        null,
+        ['a', 2, 'c'],
+      ],
+    },
+    {
+      // self-described indeterminate length kitchen sink array
+      bytes: 'D9D9F79F016161F7A261610161326162F48301616203F5F6836161026163FF',
+      expected: [
+        1,
+        'a',
+        undefined,
+        { a: 1, '2': 'b' },
+        false,
+        [1, 'b', 3],
+        true,
+        null,
+        ['a', 2, 'c'],
+      ],
+    },
+
+    {
       // array of big ints
       bytes: '831B00FFFFFFFFFFFFFF1B01000000000000001BFFFFFFFFFFFFFFFF',
       expected: [

@@ -183,7 +183,7 @@ function mapSimple(value: CborSimple): CborSimpleType {
     return CborSimpleType.Undefined;
   }
 
-  throw new EncodingError(`Unrecognized simple value: ${value}`);
+  throw new EncodingError(`Unrecognized simple value: ${value.toString()}`);
 }
 
 function encodeBytes(majorType: CborMajorType, value: Uint8Array): void {

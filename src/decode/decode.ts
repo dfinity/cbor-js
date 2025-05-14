@@ -1,5 +1,6 @@
 import {
   CBOR_SELF_DESCRIBED_TAG,
+  CBOR_STOP_CODE,
   CborMajorType,
   CborMap,
   CborMinorType,
@@ -94,7 +95,7 @@ function decodeArray(info: number, reviver?: Reviver): CborValue[] {
     const values: CborValue[] = [];
     let decodedItem = decodeItem(reviver);
 
-    while (decodedItem !== undefined) {
+    while (decodedItem !== CBOR_STOP_CODE) {
       values.push(reviver?.(decodedItem) ?? decodedItem);
       decodedItem = decodeItem(reviver);
     }
@@ -121,9 +122,11 @@ function decodeSimple(info: number): CborSimple {
     case CborSimpleType.Null: {
       return null;
     }
-    case CborSimpleType.Undefined:
-    case CborSimpleType.Break: {
+    case CborSimpleType.Undefined: {
       return undefined;
+    }
+    case CborSimpleType.Break: {
+      return CBOR_STOP_CODE;
     }
   }
 

@@ -13,7 +13,9 @@ export const CBOR_SELF_DESCRIBED_TAG = 55799;
 
 export type CborNumber = number | bigint;
 
-export type CborSimple = boolean | null | undefined;
+export const CBOR_STOP_CODE = Symbol('CBOR_STOP_CODE');
+
+export type CborSimple = boolean | null | undefined | typeof CBOR_STOP_CODE;
 
 export enum CborSimpleType {
   False = 0x14,
