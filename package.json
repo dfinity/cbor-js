@@ -8,7 +8,9 @@
     "test": "vitest run --run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
-    "bench": "vitest bench --run"
+    "bench": "vitest bench --run",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "keywords": [],
   "author": "",
@@ -32,6 +34,7 @@
     "@types/node": "^18.0.0",
     "borc": "^3.0.0",
     "cbor-x": "^1.5.4",
+    "prettier": "^3.5.3",
     "simple-cbor": "^0.4.1",
     "typescript": "^5.2.2",
     "vite": "^4.5.0",

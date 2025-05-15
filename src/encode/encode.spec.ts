@@ -3,8 +3,8 @@ import { encode, Replacer } from './encode';
 import { CborValue } from '../cbor-value';
 
 function bytesToHexArray(arrayBuffer: Uint8Array): string[] {
-  return Array.from(arrayBuffer).map((byte) =>
-    byte.toString(16).padStart(2, '0').toUpperCase()
+  return Array.from(arrayBuffer).map(byte =>
+    byte.toString(16).padStart(2, '0').toUpperCase(),
   );
 }
 
@@ -183,7 +183,7 @@ describe('encode', () => {
   describe('encode with replacer', () => {
     it('should handle objects', () => {
       const value = { a: 1, b: 2 };
-      const replacer: Replacer = (value) =>
+      const replacer: Replacer = value =>
         typeof value === 'number' ? value * 2 : value;
       const result = encode(value, replacer);
 
@@ -192,7 +192,7 @@ describe('encode', () => {
 
     it('should handle null and undefined values', () => {
       const value = { a: null, b: undefined };
-      const replacer: Replacer = (value) => (value === null ? 'null' : value);
+      const replacer: Replacer = value => (value === null ? 'null' : value);
       const result = encode(value, replacer);
 
       expect(bytesToHexString(result)).toEqual('A26161646E756C6C6162F7'); // { "a": "null", "b": undefined }
@@ -209,9 +209,9 @@ describe('encode', () => {
 
     it('should handle arrays', () => {
       const value = [1, 2, 3];
-      const replacer: Replacer = (value) =>
+      const replacer: Replacer = value =>
         Array.isArray(value)
-          ? value.map((v) => (typeof v === 'number' ? v * 2 : v))
+          ? value.map(v => (typeof v === 'number' ? v * 2 : v))
           : value;
       const result = encode(value, replacer);
 
@@ -220,7 +220,7 @@ describe('encode', () => {
 
     it('should handle objects with booleans', () => {
       const value = { a: false, b: true };
-      const replacer: Replacer = (value) =>
+      const replacer: Replacer = value =>
         typeof value === 'boolean' ? !value : value;
       const result = encode(value, replacer);
 
