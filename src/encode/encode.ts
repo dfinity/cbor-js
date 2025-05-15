@@ -29,12 +29,12 @@ let mapEntries: [string, CborValue][] = [];
 
 export type Replacer<K = never> = (
   value: CborValue<K>,
-  key?: [K] extends [never] ? string : keyof CborValue<K>
+  key?: [K] extends [never] ? string : keyof CborValue<K>,
 ) => CborValue;
 
 export function encode<T>(
   value: CborValue<T>,
-  replacer?: Replacer<T>
+  replacer?: Replacer<T>,
 ): Uint8Array {
   bytesOffset = 0;
 
@@ -106,7 +106,7 @@ function encodeHeader(majorType: CborMajorType, value: CborNumber): void {
   if (value <= TOKEN_VALUE_MAX) {
     targetView.setUint8(
       bytesOffset++,
-      encodeMajorType(majorType) | Number(value)
+      encodeMajorType(majorType) | Number(value),
     );
     return;
   }
@@ -114,7 +114,7 @@ function encodeHeader(majorType: CborMajorType, value: CborNumber): void {
   if (value <= ONE_BYTE_MAX) {
     targetView.setUint8(
       bytesOffset++,
-      encodeMajorType(majorType) | CborMinorType.OneByte
+      encodeMajorType(majorType) | CborMinorType.OneByte,
     );
     targetView.setUint8(bytesOffset, Number(value));
     bytesOffset += 1;
@@ -124,7 +124,7 @@ function encodeHeader(majorType: CborMajorType, value: CborNumber): void {
   if (value <= TWO_BYTES_MAX) {
     targetView.setUint8(
       bytesOffset++,
-      encodeMajorType(majorType) | CborMinorType.TwoBytes
+      encodeMajorType(majorType) | CborMinorType.TwoBytes,
     );
     targetView.setUint16(bytesOffset, Number(value), IS_LITTLE_ENDIAN);
     bytesOffset += 2;
@@ -134,7 +134,7 @@ function encodeHeader(majorType: CborMajorType, value: CborNumber): void {
   if (value <= FOUR_BYTES_MAX) {
     targetView.setUint8(
       bytesOffset++,
-      encodeMajorType(majorType) | CborMinorType.FourBytes
+      encodeMajorType(majorType) | CborMinorType.FourBytes,
     );
     targetView.setUint32(bytesOffset, Number(value), IS_LITTLE_ENDIAN);
     bytesOffset += 4;
@@ -144,7 +144,7 @@ function encodeHeader(majorType: CborMajorType, value: CborNumber): void {
   if (value <= EIGHT_BYTES_MAX) {
     targetView.setUint8(
       bytesOffset++,
-      encodeMajorType(majorType) | CborMinorType.EightBytes
+      encodeMajorType(majorType) | CborMinorType.EightBytes,
     );
     targetView.setBigUint64(bytesOffset, BigInt(value), IS_LITTLE_ENDIAN);
     bytesOffset += 8;
@@ -200,7 +200,7 @@ function encodeUnsignedInteger(value: CborNumber): void {
 function encodeNegativeInteger(value: CborNumber): void {
   encodeInteger(
     CborMajorType.NegativeInteger,
-    typeof value === 'bigint' ? -1n - value : -1 - value
+    typeof value === 'bigint' ? -1n - value : -1 - value,
   );
 }
 
