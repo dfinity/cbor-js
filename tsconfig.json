@@ -10,6 +10,7 @@
     "allowSyntheticDefaultImports": true
   },
   "include": ["src"],
+  "exclude": ["src/benchmarks/**/*"],
   "references": [
     {
       "path": "./tsconfig.node.json"
