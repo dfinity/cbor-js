@@ -235,7 +235,7 @@ describe('encode', () => {
       { e: 5, f: 6 },
     ];
 
-    const results = await Promise.all(values.map((value) => encode(value)));
+    const results = await Promise.all(values.map(value => encode(value)));
 
     expect(bytesToHexString(results[0])).toEqual('A2616101616202'); // { "a": 1, "b": 2 }
     expect(bytesToHexString(results[1])).toEqual('A2616303616404'); // { "c": 3, "d": 4 }

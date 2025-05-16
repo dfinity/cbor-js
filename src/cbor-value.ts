@@ -22,7 +22,7 @@ export enum CborSimpleType {
   True = 0x15,
   Null = 0x16,
   Undefined = 0x17,
-  Break = 0x1F,
+  Break = 0x1f,
 }
 
 export type CborMap<T = any> =

@@ -32,7 +32,7 @@ let mapEntries: [string, CborValue][] = [];
 
 export type Replacer<T = any> = (
   value: CborValue<T>,
-  key?: string
+  key?: string,
 ) => ReplacedCborValue<T>;
 
 export function encode<T = any>(

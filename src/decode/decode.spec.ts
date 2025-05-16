@@ -496,7 +496,7 @@ describe('decode', () => {
 
     it('should handle self-described objects', () => {
       const bytes = 'D9D9F7A2616101616202'; // { "a": 1, "b": 2 }
-      const reviver: Reviver = (value) =>
+      const reviver: Reviver = value =>
         typeof value === 'number' ? value * 2 : value;
       const result = decode(hexStringToBytes(bytes), reviver);
 
@@ -513,7 +513,7 @@ describe('decode', () => {
 
     it('should handle self-described null and undefined values', () => {
       const bytes = 'D9D9F7A26161F66162F7'; // { "a": null, "b": undefined }
-      const reviver: Reviver = (value) => (value === null ? 'null' : value);
+      const reviver: Reviver = value => (value === null ? 'null' : value);
       const result = decode(hexStringToBytes(bytes), reviver);
 
       expect(result).toEqual({ a: 'null', b: undefined });
@@ -548,8 +548,8 @@ describe('decode', () => {
 
     it('should handle self-described arrays', () => {
       const bytes = 'D9D9F783010203'; // [1, 2, 3]
-      const reviver: Reviver = (value) =>
-        Array.isArray(value) ? value.map((v) => (v as number) * 2) : value;
+      const reviver: Reviver = value =>
+        Array.isArray(value) ? value.map(v => (v as number) * 2) : value;
       const result = decode(hexStringToBytes(bytes), reviver);
 
       expect(result).toEqual([2, 4, 6]);
@@ -566,7 +566,7 @@ describe('decode', () => {
 
     it('should handle self-described objects with booleans', () => {
       const bytes = 'D9D9F7A26161F46162F5'; // { "a": false, "b": true }
-      const reviver: Reviver = (value) =>
+      const reviver: Reviver = value =>
         typeof value === 'boolean' ? !value : value;
       const result = decode(hexStringToBytes(bytes), reviver);
 
@@ -582,7 +582,7 @@ describe('decode', () => {
     ];
 
     const results = await Promise.all(
-      values.map((value) => decode(hexStringToBytes(value)))
+      values.map(value => decode(hexStringToBytes(value))),
     );
 
     expect(results[0]).toEqual({ a: 1, b: 2 });
