@@ -43,6 +43,7 @@ jobs:
         uses: dfinity/ci-tools/actions/npm-publish@main
         with:
           token: ${{ secrets.NPM_ACCESS_TOKEN }}
+          is_beta: ${{ steps.is_beta.outputs.is_beta_tag }}
 
       - name: Create Github release
         uses: ncipollo/release-action@v1
