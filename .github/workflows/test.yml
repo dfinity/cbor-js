@@ -1,0 +1,19 @@
+name: test
+
+on:
+  merge_group:
+  pull_request:
+
+jobs:
+  unit_test:
+    name: unit_test:required
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PNPM
+        uses: dfinity/ci-tools/actions/setup-pnpm@main
+
+      - name: Test
+        run: pnpm test
