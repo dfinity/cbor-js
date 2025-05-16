@@ -32,7 +32,7 @@ export function runLibEncodingComparison(data: CborValue): void {
 
 export function runLibDecodingComparison(
   cborBytes: Uint8Array,
-  jsonString: string
+  jsonString: string,
 ): void {
   bench('CBOR', () => {
     decode(cborBytes);
@@ -58,7 +58,7 @@ const MAX_NUMBER = Number.MAX_SAFE_INTEGER;
 export function randomObject(): CborValue {
   const entries = randomArray(
     () => [String(randomNumber()), randomNumber()],
-    OBJ_SIZE
+    OBJ_SIZE,
   );
 
   return Object.fromEntries(entries);
@@ -78,7 +78,7 @@ function randomNumber(): number {
 
 function randomArray<T extends CborValue>(
   generator: () => T,
-  length = ARRAY_SIZE
+  length = ARRAY_SIZE,
 ): T[] {
   return Array.from({ length }, generator);
 }

@@ -3,7 +3,7 @@ import { decode, Reviver } from './decode';
 import { CborValue } from '../cbor-value';
 
 function hexArrayToBytes(hexArray: string[]): Uint8Array {
-  return new Uint8Array(hexArray.map((byte) => parseInt(byte, 16)));
+  return new Uint8Array(hexArray.map(byte => parseInt(byte, 16)));
 }
 
 function hexStringToBytes(hexString: string): Uint8Array {
@@ -487,7 +487,7 @@ describe('decode', () => {
   describe('decode with reviver', () => {
     it('should handle objects', () => {
       const bytes = 'A2616101616202'; // { "a": 1, "b": 2 }
-      const reviver: Reviver = (value) =>
+      const reviver: Reviver = value =>
         typeof value === 'number' ? value * 2 : value;
       const result = decode(hexStringToBytes(bytes), reviver);
 
@@ -505,7 +505,7 @@ describe('decode', () => {
 
     it('should handle null and undefined values', () => {
       const bytes = 'A26161F66162F7'; // { "a": null, "b": undefined }
-      const reviver: Reviver = (value) => (value === null ? 'null' : value);
+      const reviver: Reviver = value => (value === null ? 'null' : value);
       const result = decode(hexStringToBytes(bytes), reviver);
 
       expect(result).toEqual({ a: 'null', b: undefined });
@@ -539,8 +539,8 @@ describe('decode', () => {
 
     it('should handle arrays', () => {
       const bytes = '83010203'; // [1, 2, 3]
-      const reviver: Reviver = (value) =>
-        Array.isArray(value) ? value.map((v) => (v as number) * 2) : value;
+      const reviver: Reviver = value =>
+        Array.isArray(value) ? value.map(v => (v as number) * 2) : value;
       const result = decode(hexStringToBytes(bytes), reviver);
 
       expect(result).toEqual([2, 4, 6]);
@@ -557,7 +557,7 @@ describe('decode', () => {
 
     it('should handle objects with booleans', () => {
       const bytes = 'A26161F46162F5'; // { "a": false, "b": true }
-      const reviver: Reviver = (value) =>
+      const reviver: Reviver = value =>
         typeof value === 'boolean' ? !value : value;
       const result = decode(hexStringToBytes(bytes), reviver);
 

@@ -1,6 +1,6 @@
 {
   "name": "@dfinity/cbor",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "",
   "packageManager": "pnpm@10.10.0+sha512.d615db246fe70f25dcfea6d8d73dee782ce23e2245e3c4f6f888249fb568149318637dca73c2c5c8ef2a4ca0d5657fb9567188bfab47f566d1ee6ce987815c39",
   "scripts": {
@@ -8,7 +8,9 @@
     "test": "vitest run --run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
-    "bench": "vitest bench --run"
+    "bench": "vitest bench --run",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "keywords": [],
   "author": "",
@@ -32,6 +34,7 @@
     "@types/node": "^18.0.0",
     "borc": "^3.0.0",
     "cbor-x": "^1.5.4",
+    "prettier": "^3.5.3",
     "simple-cbor": "^0.4.1",
     "typescript": "^5.2.2",
     "vite": "^4.5.0",

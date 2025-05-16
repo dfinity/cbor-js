@@ -28,12 +28,12 @@ let bytesOffset = 0;
 
 export type Reviver<K extends CborValue = CborValue> = (
   value: K,
-  key?: K extends CborValue ? string : keyof K
+  key?: K extends CborValue ? string : keyof K,
 ) => [K] extends [never] ? CborValue : K;
 
 export function decode<T extends CborValue = CborValue>(
   input: Uint8Array,
-  reviver?: Reviver<T>
+  reviver?: Reviver<T>,
 ): T {
   cborBytes = input;
   dataView = new DataView(cborBytes.buffer);
