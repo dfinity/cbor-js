@@ -1,5 +1,8 @@
 # CBOR encoder/decoder
 
+[![Test](https://github.com/dfinity/cbor/actions/workflows/test.yml/badge.svg)](https://github.com/dfinity/cbor/actions/workflows/test.yml)
+[![Lint](https://github.com/dfinity/cbor/actions/workflows/lint.yml/badge.svg)](https://github.com/dfinity/cbor/actions/workflows/lint.yml)
+
 ## Not implemented
 
 - Custom replacer.
@@ -14,3 +17,29 @@
 - Indeterminite length encoding for text and byte strings
   - To encode a string length longer than the previously mentioned 8 byte limit, a string can be encoded with an "indeterminate" length.
   - Similar to the previous point, this would be impractical for the IC due to message limits.
+
+## Contributing
+
+Check out the [contribution guidelines](./.github/CONTRIBUTING.md).
+
+### Setup
+
+- Install [pnpm](https://pnpm.io/)
+- Install [commitizen](https://commitizen-tools.github.io/commitizen/)
+- Install [pre-commit](https://pre-commit.com/)
+- Install dependencies:
+  ```bash
+  pnpm install
+  ```
+
+### Running tests
+
+```bash
+pnpm test
+```
+
+### Formatting
+
+```bash
+pnpm format
+```
