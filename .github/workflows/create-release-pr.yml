@@ -38,7 +38,7 @@ jobs:
         uses: dfinity/ci-tools/actions/setup-pnpm@main
 
       - name: Build package
-        run: pnpm build:pic
+        run: pnpm build
 
       - name: Bump version
         id: bump_version
