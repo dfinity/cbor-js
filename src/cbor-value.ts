@@ -9,6 +9,11 @@ export type ReplacedCborValue<T = any> =
   | CborMap<T>
   | CborSimple;
 
+/**
+ * The tag number `55799`, the self-described tag for CBOR.
+ * The serialization of this tag's head is `0xd9d9f7`.
+ * @see {@link https://www.rfc-editor.org/rfc/rfc8949.html#section-3.4.6}
+ */
 export const CBOR_SELF_DESCRIBED_TAG = 55799;
 
 export type CborNumber = number | bigint;
