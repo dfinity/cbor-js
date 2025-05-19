@@ -30,7 +30,7 @@ let bytesOffset = 0;
  * A function that can be used to manipulate the decoded value.
  * See {@link decode} for more information.
  * @param value - The value to manipulate.
- * @param key - The key of the value to manipulate.
+ * @param key - The current key in a map, or the current stringified index in an array.
  * @returns The manipulated value.
  */
 export type Reviver<K extends CborValue = CborValue> = (

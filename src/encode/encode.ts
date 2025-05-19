@@ -34,7 +34,7 @@ let mapEntries: [string, CborValue][] = [];
  * A function that can be used to manipulate the input before it is encoded.
  * See {@link encode} for more information.
  * @param value - The value to manipulate.
- * @param key - The key of the value to manipulate.
+ * @param key - The current key in a map, or the current stringified index in an array.
  * @returns The manipulated value.
  */
 export type Replacer<T = any> = (
