@@ -227,4 +227,18 @@ describe('encode', () => {
       expect(bytesToHexString(result)).toEqual('A26161F56162F4'); // { "a": true, "b": false }
     });
   });
+
+  it('should encode concurrently', async () => {
+    const values = [
+      { a: 1, b: 2 },
+      { c: 3, d: 4 },
+      { e: 5, f: 6 },
+    ];
+
+    const results = await Promise.all(values.map(value => encode(value)));
+
+    expect(bytesToHexString(results[0])).toEqual('A2616101616202'); // { "a": 1, "b": 2 }
+    expect(bytesToHexString(results[1])).toEqual('A2616303616404'); // { "c": 3, "d": 4 }
+    expect(bytesToHexString(results[2])).toEqual('A2616505616606'); // { "e": 5, "f": 6 }
+  });
 });

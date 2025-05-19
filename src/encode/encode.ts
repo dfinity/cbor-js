@@ -6,6 +6,7 @@ import {
   CborSimple,
   CborSimpleType,
   CborValue,
+  ReplacedCborValue,
   EIGHT_BYTES_MAX,
   FOUR_BYTES_MAX,
   ONE_BYTE_MAX,
@@ -18,6 +19,8 @@ import { IS_LITTLE_ENDIAN, resizeUint8Array } from '../util';
 const INITIAL_BUFFER_SIZE = 2 * 1_024;
 const SAFE_BUFFER_END_OFFSET = 100;
 
+const textEncoder = new TextEncoder();
+
 function encodeMajorType(majorType: CborMajorType): number {
   return majorType << 5;
 }
@@ -27,21 +30,21 @@ let targetView = new DataView(target.buffer);
 let bytesOffset = 0;
 let mapEntries: [string, CborValue][] = [];
 
-export type Replacer<K = never> = (
-  value: CborValue<K>,
-  key?: [K] extends [never] ? string : keyof CborValue<K>,
-) => CborValue;
+export type Replacer<T = any> = (
+  value: CborValue<T>,
+  key?: string,
+) => ReplacedCborValue<T>;
 
-export function encode<T>(
+export function encode<T = any>(
   value: CborValue<T>,
   replacer?: Replacer<T>,
 ): Uint8Array {
   bytesOffset = 0;
 
   const transformedValue = replacer?.(value) ?? value;
-  encodeItem(transformedValue as CborValue, replacer);
+  encodeItem(transformedValue, replacer);
 
-  return target.subarray(0, bytesOffset);
+  return target.slice(0, bytesOffset);
 }
 
 function encodeItem(item: CborValue, replacer?: Replacer): void {
@@ -67,6 +70,11 @@ function encodeItem(item: CborValue, replacer?: Replacer): void {
 
   if (item instanceof Uint8Array) {
     encodeByteString(item);
+    return;
+  }
+
+  if (item instanceof ArrayBuffer) {
+    encodeByteString(new Uint8Array(item));
     return;
   }
 
@@ -175,7 +183,7 @@ function mapSimple(value: CborSimple): CborSimpleType {
     return CborSimpleType.Undefined;
   }
 
-  throw new EncodingError(`Unrecognized simple value: ${value}`);
+  throw new EncodingError(`Unrecognized simple value: ${value.toString()}`);
 }
 
 function encodeBytes(majorType: CborMajorType, value: Uint8Array): void {
@@ -209,7 +217,7 @@ function encodeNumber(value: CborNumber): void {
 }
 
 function encodeTextString(value: string): void {
-  encodeBytes(CborMajorType.TextString, new TextEncoder().encode(value));
+  encodeBytes(CborMajorType.TextString, textEncoder.encode(value));
 }
 
 function encodeByteString(value: Uint8Array): void {
