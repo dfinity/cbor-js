@@ -30,11 +30,36 @@ let targetView = new DataView(target.buffer);
 let bytesOffset = 0;
 let mapEntries: [string, CborValue][] = [];
 
+/**
+ * A function that can be used to manipulate the input before it is encoded.
+ * See {@link encode} for more information.
+ * @param value - The value to manipulate.
+ * @param key - The current key in a map, or the current stringified index in an array.
+ * @returns The manipulated value.
+ */
 export type Replacer<T = any> = (
   value: CborValue<T>,
   key?: string,
 ) => ReplacedCborValue<T>;
 
+/**
+ * Encodes a value into a CBOR byte array.
+ * @param value - The value to encode.
+ * @param replacer - A function that can be used to manipulate the input before it is encoded.
+ * @returns The encoded value.
+ *
+ * @example Simple
+ * ```ts
+ * const value = true;
+ * const encoded = encode(value); // returns `Uint8Array [245]` (which is "F5" in hex)
+ * ```
+ *
+ * @example Replacer
+ * ```ts
+ * const replacer: Replacer = val => (typeof val === 'number' ? val * 2 : val);
+ * encode({ a: 1, b: 2 }, replacer); // returns the Uint8Array corresponding to the CBOR encoding of `{ a: 2, b: 4 }`
+ * ```
+ */
 export function encode<T = any>(
   value: CborValue<T>,
   replacer?: Replacer<T>,

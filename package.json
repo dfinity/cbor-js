@@ -23,7 +23,8 @@
     "test:coverage": "vitest run --coverage",
     "bench": "vitest bench --run",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "tsdoc": "tsdoc --src=src/*,src/encode/*,src/decode/* && prettier --write README.md"
   },
   "files": [
     "dist"
@@ -46,6 +47,7 @@
     "cbor-x": "^1.5.4",
     "prettier": "^3.5.3",
     "simple-cbor": "^0.4.1",
+    "tsdoc-markdown": "^1.2.0",
     "typescript": "^5.2.2",
     "vite": "^4.5.0",
     "vite-plugin-checker": "^0.6.2",
