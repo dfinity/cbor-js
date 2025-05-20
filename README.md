@@ -1,7 +1,7 @@
 # CBOR encoder/decoder
 
-[![Test](https://github.com/dfinity/cbor/actions/workflows/test.yml/badge.svg)](https://github.com/dfinity/cbor/actions/workflows/test.yml)
-[![Lint](https://github.com/dfinity/cbor/actions/workflows/lint.yml/badge.svg)](https://github.com/dfinity/cbor/actions/workflows/lint.yml)
+[![Test](https://github.com/dfinity/cbor-js/actions/workflows/test.yml/badge.svg)](https://github.com/dfinity/cbor-js/actions/workflows/test.yml)
+[![Lint](https://github.com/dfinity/cbor-js/actions/workflows/lint.yml/badge.svg)](https://github.com/dfinity/cbor-js/actions/workflows/lint.yml)
 
 ## Not implemented
 
