@@ -4,9 +4,9 @@
   "description": "A small implementation of Concise Binary Object Representation (CBOR) in pure JavaScript.",
   "author": "DFINITY Stiftung",
   "license": "Apache-2.0",
-  "repository": "github:dfinity/cbor",
-  "bugs": "https://github.com/dfinity/cbor/issues",
-  "homepage": "https://dfinity.github.io/cbor",
+  "repository": "github:dfinity/cbor-js",
+  "bugs": "https://github.com/dfinity/cbor-js/issues",
+  "homepage": "https://dfinity.github.io/cbor-js",
   "keywords": [
     "cbor",
     "data-format",
