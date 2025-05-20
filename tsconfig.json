@@ -9,11 +9,11 @@
     "moduleResolution": "Node",
     "allowSyntheticDefaultImports": true
   },
-  "include": ["src"],
-  "exclude": ["src/benchmarks/**/*", "src/**/*.spec.ts"],
+  "include": ["./src/**/*"],
+  "exclude": ["./src/benchmarks/**/*", "./src/**/*.spec.ts"],
   "references": [
     {
-      "path": "./tsconfig.node.json"
+      "path": "./tsconfig.vite.json"
     }
   ]
 }

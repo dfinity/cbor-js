@@ -2,8 +2,15 @@ import { resolve } from 'path';
 import { defineConfig } from 'vitest/config';
 import checker from 'vite-plugin-checker';
 
-export default defineConfig({
-  plugins: [checker({ typescript: true })],
+export default defineConfig(({ mode }) => ({
+  plugins: [
+    checker({
+      typescript: {
+        tsconfigPath:
+          mode === 'test' ? './tsconfig.test.json' : './tsconfig.json',
+      },
+    }),
+  ],
   build: {
     lib: {
       entry: resolve(__dirname, 'src', 'index.ts'),
@@ -13,4 +20,4 @@ export default defineConfig({
     sourcemap: true,
     minify: true,
   },
-});
+}));
