@@ -13,7 +13,14 @@ A small implementation of Concise Binary Object Representation (CBOR) in pure Ja
 ## Installation
 
 ```bash
+# npm
+npm install @dfinity/cbor
+
+# pnpm
 pnpm add @dfinity/cbor
+
+# yarn
+yarn add @dfinity/cbor
 ```
 
 ## Usage
