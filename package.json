@@ -27,8 +27,7 @@
     "tsdoc": "tsdoc --src=src/*,src/encode/*,src/decode/* && prettier --write README.md"
   },
   "files": [
-    "dist",
-    "NOTICE"
+    "dist"
   ],
   "main": "./dist/cbor.umd.js",
   "module": "./dist/cbor.mjs",
