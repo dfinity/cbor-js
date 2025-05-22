@@ -1,5 +1,7 @@
+/// <reference types="vitest/config" />
+
 import { resolve } from 'path';
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 
 export default defineConfig(({ mode }) => ({

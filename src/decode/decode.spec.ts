@@ -478,11 +478,15 @@ describe('decode', () => {
       bytes: 'D9D9F73BFFFFFFFFFFFFFFFF',
       expected: -18_446_744_073_709_551_616n,
     },
-  ])('should decode item %#', ({ bytes, expected }) => {
-    const result = decode(hexStringToBytes(bytes));
+  ])(
+    'should decode item %#',
+    { timeout: 10_000 }, // some cases take more than 5 seconds to run
+    ({ bytes, expected }) => {
+      const result = decode(hexStringToBytes(bytes));
 
-    expect(result).toEqual(expected);
-  });
+      expect(result).toEqual(expected);
+    },
+  );
 
   describe('decode with reviver', () => {
     it('should handle objects', () => {

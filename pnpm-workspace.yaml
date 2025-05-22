@@ -1,0 +1,3 @@
+onlyBuiltDependencies:
+  - cbor-extract
+  - esbuild
