@@ -12,14 +12,21 @@ A small implementation of Concise Binary Object Representation (CBOR) in pure Ja
 
 ## Installation
 
+Using `npm`:
+
 ```bash
-# npm
 npm install @dfinity/cbor
+```
 
-# pnpm
+Using `pnpm`:
+
+```bash
 pnpm add @dfinity/cbor
+```
 
-# yarn
+Using `yarn`:
+
+```bash
 yarn add @dfinity/cbor
 ```
 
@@ -282,3 +289,7 @@ To update the documentation in the `README.md` file, run:
 ```bash
 pnpm tsdoc
 ```
+
+## License
+
+This project is licensed under the [Apache License 2.0](./LICENSE).
