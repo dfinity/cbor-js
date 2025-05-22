@@ -34,23 +34,23 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/cbor.mjs",
-      "require": "./dist/cbor.umd.js",
       "types": {
         "default": "./dist/index.d.ts"
-      }
+      },
+      "import": "./dist/cbor.mjs",
+      "require": "./dist/cbor.umd.js"
     }
   },
   "devDependencies": {
-    "@types/node": "^18.0.0",
+    "@types/node": "^22.15.21",
     "borc": "^3.0.0",
-    "cbor-x": "^1.5.4",
+    "cbor-x": "^1.6.0",
     "prettier": "^3.5.3",
     "simple-cbor": "^0.4.1",
     "tsdoc-markdown": "^1.2.0",
-    "typescript": "^5.2.2",
-    "vite": "^4.5.0",
-    "vite-plugin-checker": "^0.6.2",
-    "vitest": "0.34.6"
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vite-plugin-checker": "^0.9.3",
+    "vitest": "3.1.4"
   }
 }
