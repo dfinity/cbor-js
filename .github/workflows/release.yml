@@ -46,7 +46,7 @@ jobs:
           is_beta: ${{ steps.is_beta.outputs.is_beta_tag }}
 
       - name: Create Github release
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@v1.16.0
         with:
           artifacts: ${{ steps.publish.outputs.artifact_filepath }}
           bodyFile: 'RELEASE_NOTES.md'
