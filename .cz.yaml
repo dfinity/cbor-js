@@ -4,4 +4,4 @@ commitizen:
   tag_format: $version
   version: 0.1.0
   version_files:
-  - package.json:version
+    - package.json:version

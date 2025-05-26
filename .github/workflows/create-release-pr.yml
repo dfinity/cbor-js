@@ -47,6 +47,9 @@ jobs:
           prerelease: ${{ inputs.beta_release == true && 'beta' || '' }}
           major_version_zero: true
 
+      - name: Format code
+        run: pnpm format
+
       - name: Print Version
         run: echo "Bumping to version ${{ steps.bump_version.outputs.version }}"
 
