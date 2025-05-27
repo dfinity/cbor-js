@@ -1,3 +1,9 @@
+## Unreleased
+
+### Fix
+
+- export `encodeWithSelfDescribedTag` function (#35)
+
 ## 0.2.0 (2025-05-27)
 
 ### Feat
