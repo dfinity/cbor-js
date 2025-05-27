@@ -59,7 +59,7 @@ export const TOKEN_VALUE_MAX = 0x17;
 export const ONE_BYTE_MAX = 0xff;
 export const TWO_BYTES_MAX = 0xffff;
 export const FOUR_BYTES_MAX = 0xffffffff;
-export const EIGHT_BYTES_MAX = 0xffffffffffffffffn;
+export const EIGHT_BYTES_MAX = BigInt('0xffffffffffffffff');
 
 export enum CborMinorType {
   Value = 23,
