@@ -1,2 +1,2 @@
 export { EncodingError } from './encoding-error';
-export { encode } from './encode';
+export { encode, encodeWithSelfDescribedTag } from './encode';
