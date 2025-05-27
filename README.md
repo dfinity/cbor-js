@@ -68,6 +68,7 @@ decode(bytes, reviver); // { a: 2, b: 4 }
 
 - [decode](#gear-decode)
 - [encode](#gear-encode)
+- [encodeWithSelfDescribedTag](#gear-encodewithselfdescribedtag)
 
 ### :gear: decode
 
@@ -128,6 +129,26 @@ Replacer
 ```ts
 const replacer: Replacer = val => (typeof val === 'number' ? val * 2 : val);
 encode({ a: 1, b: 2 }, replacer); // returns the Uint8Array corresponding to the CBOR encoding of `{ a: 2, b: 4 }`
+```
+
+### :gear: encodeWithSelfDescribedTag
+
+Encodes a value into a CBOR byte array (same as {@link encode}), but prepends the self-described CBOR tag (55799).
+
+| Function                     | Type                                                                                                 |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `encodeWithSelfDescribedTag` | `<T = any>(value: CborValue<T>, replacer?: Replacer<T> or undefined) => Uint8Array<ArrayBufferLike>` |
+
+Parameters:
+
+- `value`: - The value to encode.
+- `replacer`: - A function that can be used to manipulate the input before it is encoded.
+
+Examples:
+
+```ts
+const value = true;
+const encoded = encodeWithSelfDescribedTag(value); // returns the Uint8Array [217, 217, 247, 245] (which is "D9D9F7F5" in hex)
 ```
 
 ## :wrench: Constants
