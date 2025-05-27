@@ -202,9 +202,11 @@ The serialization of this tag's head is `0xd9d9f7`.
 
 ### :gear: EIGHT_BYTES_MAX
 
-| Constant          | Type                    |
-| ----------------- | ----------------------- |
-| `EIGHT_BYTES_MAX` | `18446744073709551615n` |
+The maximum value that can be encoded in 8 bytes: `18446744073709551615n`.
+
+| Constant          | Type     |
+| ----------------- | -------- |
+| `EIGHT_BYTES_MAX` | `bigint` |
 
 ## :factory: DecodingError
 

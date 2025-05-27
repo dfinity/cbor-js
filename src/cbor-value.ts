@@ -59,7 +59,10 @@ export const TOKEN_VALUE_MAX = 0x17;
 export const ONE_BYTE_MAX = 0xff;
 export const TWO_BYTES_MAX = 0xffff;
 export const FOUR_BYTES_MAX = 0xffffffff;
-export const EIGHT_BYTES_MAX = 0xffffffffffffffffn;
+/**
+ * The maximum value that can be encoded in 8 bytes: `18446744073709551615n`.
+ */
+export const EIGHT_BYTES_MAX = BigInt('0xffffffffffffffff');
 
 export enum CborMinorType {
   Value = 23,
