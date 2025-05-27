@@ -162,7 +162,7 @@ const TEST_CASES: Array<{ value: CborValue; expected: string }> = [
 ];
 
 describe('encode', () => {
-  it.each<{ value: CborValue; expected: string }>(TEST_CASES)(
+  it.each(TEST_CASES)(
     'should encode item %#',
     { timeout: 10_000 }, // some cases take more than 5 seconds to run
     ({ value, expected }) => {
@@ -250,7 +250,7 @@ describe('encode', () => {
 });
 
 describe('encodeWithSelfDescribedTag', () => {
-  it.each<{ value: CborValue; expected: string }>(TEST_CASES)(
+  it.each(TEST_CASES)(
     'should encode item %# with self-described tag',
     { timeout: 10_000 }, // some cases take more than 5 seconds to run
     ({ value, expected }) => {
