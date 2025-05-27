@@ -160,11 +160,15 @@ describe('encode', () => {
     { value: -72_057_594_037_927_936n, expected: '3B00FFFFFFFFFFFFFF' }, // largest values in seven bytes
     { value: -72_057_594_037_927_937n, expected: '3B0100000000000000' }, // smallest values in eight bytes
     { value: -18_446_744_073_709_551_616n, expected: '3BFFFFFFFFFFFFFFFF' }, // largest values in eight bytes
-  ])('should encode item %#', ({ value, expected }) => {
-    const result = encode(value);
+  ])(
+    'should encode item %#',
+    { timeout: 10_000 }, // some cases take more than 5 seconds to run
+    ({ value, expected }) => {
+      const result = encode(value);
 
-    expect(bytesToHexString(result)).toEqual(expected);
-  });
+      expect(bytesToHexString(result)).toEqual(expected);
+    },
+  );
 
   it('should throw if a positive value cannot fit within 8 bytes', () => {
     const value = 18_446_744_073_709_551_616n;

@@ -37,15 +37,15 @@ jobs:
       - name: Setup PNPM
         uses: dfinity/ci-tools/actions/setup-pnpm@main
 
-      - name: Build package
-        run: pnpm build
-
       - name: Bump version
         id: bump_version
         uses: dfinity/ci-tools/actions/bump-version@main
         with:
           prerelease: ${{ inputs.beta_release == true && 'beta' || '' }}
           major_version_zero: true
+
+      - name: Make sure everything is formatted
+        run: pnpm format
 
       - name: Print Version
         run: echo "Bumping to version ${{ steps.bump_version.outputs.version }}"
