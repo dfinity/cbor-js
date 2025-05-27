@@ -1,6 +1,6 @@
 {
   "name": "@dfinity/cbor",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A small implementation of Concise Binary Object Representation (CBOR) in pure JavaScript.",
   "author": "DFINITY Stiftung",
   "license": "Apache-2.0",
