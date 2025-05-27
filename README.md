@@ -74,9 +74,9 @@ decode(bytes, reviver); // { a: 2, b: 4 }
 Decodes a CBOR byte array into a value.
 See {@link Reviver} for more information.
 
-| Function | Type                                                                                   |
-| -------- | -------------------------------------------------------------------------------------- |
-| `decode` | `<T extends unknown = any>(input: Uint8Array, reviver?: Reviver<T> or undefined) => T` |
+| Function | Type                                                                                                    |
+| -------- | ------------------------------------------------------------------------------------------------------- |
+| `decode` | `<T extends unknown = any>(input: Uint8Array<ArrayBufferLike>, reviver?: Reviver<T> or undefined) => T` |
 
 Parameters:
 
@@ -105,9 +105,9 @@ decode(bytes, reviver); // returns `{ a: 2, b: 4 }`
 
 Encodes a value into a CBOR byte array.
 
-| Function | Type                                                                                |
-| -------- | ----------------------------------------------------------------------------------- |
-| `encode` | `<T = any>(value: CborValue<T>, replacer?: Replacer<T> or undefined) => Uint8Array` |
+| Function | Type                                                                                                 |
+| -------- | ---------------------------------------------------------------------------------------------------- |
+| `encode` | `<T = any>(value: CborValue<T>, replacer?: Replacer<T> or undefined) => Uint8Array<ArrayBufferLike>` |
 
 Parameters:
 
@@ -181,9 +181,11 @@ The serialization of this tag's head is `0xd9d9f7`.
 
 ### :gear: EIGHT_BYTES_MAX
 
-| Constant          | Type                    |
-| ----------------- | ----------------------- |
-| `EIGHT_BYTES_MAX` | `18446744073709551615n` |
+The maximum value that can be encoded in 8 bytes: `18446744073709551615n`.
+
+| Constant          | Type     |
+| ----------------- | -------- |
+| `EIGHT_BYTES_MAX` | `bigint` |
 
 ## :factory: DecodingError
 
