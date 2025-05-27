@@ -12,6 +12,7 @@ import {
   ONE_BYTE_MAX,
   TOKEN_VALUE_MAX,
   TWO_BYTES_MAX,
+  CBOR_SELF_DESCRIBED_TAG,
 } from '../cbor-value';
 import { EncodingError } from './encoding-error';
 import { IS_LITTLE_ENDIAN, resizeUint8Array } from '../util';
@@ -68,6 +69,30 @@ export function encode<T = any>(
 
   const transformedValue = replacer?.(value) ?? value;
   encodeItem(transformedValue, replacer);
+
+  return target.slice(0, bytesOffset);
+}
+
+/**
+ * Encodes a value into a CBOR byte array (same as {@link encode}), but prepends the self-described CBOR tag (55799).
+ * @param value - The value to encode.
+ * @param replacer - A function that can be used to manipulate the input before it is encoded.
+ * @returns The encoded value with the self-described CBOR tag.
+ *
+ * @example
+ * ```ts
+ * const value = true;
+ * const encoded = encodeWithSelfDescribedTag(value); // returns the Uint8Array [217, 217, 247, 245] (which is "D9D9F7F5" in hex)
+ * ```
+ */
+export function encodeWithSelfDescribedTag<T = any>(
+  value: CborValue<T>,
+  replacer?: Replacer<T>,
+): Uint8Array {
+  bytesOffset = 0;
+
+  const transformedValue = replacer?.(value) ?? value;
+  encodeTag(CBOR_SELF_DESCRIBED_TAG, transformedValue, replacer);
 
   return target.slice(0, bytesOffset);
 }
@@ -247,4 +272,9 @@ function encodeTextString(value: string): void {
 
 function encodeByteString(value: Uint8Array): void {
   encodeBytes(CborMajorType.ByteString, value);
+}
+
+function encodeTag(tag: number, value: CborValue, replacer?: Replacer): void {
+  encodeHeader(CborMajorType.Tag, tag);
+  encodeItem(value, replacer);
 }
