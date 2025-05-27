@@ -1,3 +1,13 @@
+## Unreleased
+
+### Feat
+
+- `encodeWithSelfDescribedTag` function (#30)
+
+### Fix
+
+- use explicit BigInt constructor for constants (#31)
+
 ## 0.1.0 (2025-05-26)
 
 ### Feat
