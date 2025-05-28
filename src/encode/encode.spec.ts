@@ -106,6 +106,14 @@ const TEST_CASES: Array<{ value: CborValue; expected: string }> = [
     expected: `7A01000000${new Array(16_777_216).fill('61').join('')}`,
   },
 
+  // ###### BYTES ######
+
+  { value: new Uint8Array([1, 2, 3]), expected: '43010203' },
+  { value: new Uint8Array(), expected: '40' },
+  { value: new Uint8Array([4, 5, 6]).buffer, expected: '43040506' },
+  { value: new ArrayBuffer(3), expected: '43000000' },
+  { value: new ArrayBuffer(0), expected: '40' },
+
   // ###### POSITIVE NUMBERS ######
 
   { value: 1, expected: '01' }, // largest value in 1 bit
