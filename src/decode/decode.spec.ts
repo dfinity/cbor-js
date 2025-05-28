@@ -369,6 +369,15 @@ describe('decode', () => {
       expected: new Array(16_777_216).fill('a').join(''),
     },
 
+    // ###### BYTES ######
+
+    { bytes: '43010203', expected: new Uint8Array([1, 2, 3]) },
+    { bytes: 'D9D9F743010203', expected: new Uint8Array([1, 2, 3]) },
+    { bytes: '43000000', expected: new Uint8Array([0, 0, 0]) },
+    { bytes: 'D9D9F743000000', expected: new Uint8Array([0, 0, 0]) },
+    { bytes: '40', expected: new Uint8Array() },
+    { bytes: 'D9D9F740', expected: new Uint8Array() },
+
     // ###### POSITIVE INTEGERS ######
 
     { bytes: '01', expected: 1 }, // largest value in 1 bit
