@@ -23,7 +23,7 @@ function decodeInfo(firstByte: number): number {
 }
 
 let cborBytes = new Uint8Array();
-let dataView = new DataView(cborBytes.buffer);
+let dataView: DataView | undefined;
 let bytesOffset = 0;
 
 /**
@@ -64,7 +64,6 @@ export function decode<T extends CborValue = CborValue>(
   reviver?: Reviver<T>,
 ): T {
   cborBytes = input;
-  dataView = new DataView(cborBytes.buffer);
   bytesOffset = 0;
 
   const decodedItem = decodeItem(reviver as Reviver | undefined) as T;
@@ -202,7 +201,7 @@ function decodeUnsignedInteger(info: number): CborNumber {
     return info;
   }
 
-  dataView = new DataView(cborBytes.buffer, bytesOffset);
+  dataView = new DataView(cborBytes.buffer, cborBytes.byteOffset + bytesOffset);
   switch (info) {
     case CborMinorType.OneByte:
       bytesOffset++;
