@@ -1,5 +1,9 @@
 ## Unreleased
 
+### Fix
+
+- handle offset views correctly (#40)
+
 ## 0.2.1 (2025-05-27)
 
 ### Fix
