@@ -217,7 +217,6 @@ The maximum value that can be encoded in 8 bytes: `18446744073709551615n`.
 - [CborSimpleType](#gear-cborsimpletype)
 - [CborMajorType](#gear-cbormajortype)
 - [CborMinorType](#gear-cborminortype)
-- [CborTag](#gear-cbortag)
 
 ### :gear: CborSimpleType
 
@@ -252,15 +251,6 @@ The maximum value that can be encoded in 8 bytes: `18446744073709551615n`.
 | `FourBytes`  | `26` |             |
 | `EightBytes` | `27` |             |
 | `Indefinite` | `31` |             |
-
-### :gear: CborTag
-
-| Property           | Type | Description |
-| ------------------ | ---- | ----------- |
-| `DATE_TIME_STRING` | `0`  |             |
-| `UNIX_TIMESTAMP`   | `1`  |             |
-| `UNSIGNED_BIGNUM`  | `2`  |             |
-| `NEGATIVE_BIGNUM`  | `3`  |             |
 
 <!-- TSDOC_END -->
 

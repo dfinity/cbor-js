@@ -72,10 +72,3 @@ export enum CborMinorType {
   EightBytes = 27,
   Indefinite = 31,
 }
-
-export enum CborTag {
-  DATE_TIME_STRING = 0,
-  UNIX_TIMESTAMP = 1,
-  UNSIGNED_BIGNUM = 2,
-  NEGATIVE_BIGNUM = 3,
-}
