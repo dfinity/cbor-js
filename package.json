@@ -6,7 +6,7 @@
   "license": "Apache-2.0",
   "repository": "github:dfinity/cbor-js",
   "bugs": "https://github.com/dfinity/cbor-js/issues",
-  "homepage": "https://dfinity.github.io/cbor-js",
+  "homepage": "https://github.com/dfinity/cbor-js#readme",
   "keywords": [
     "cbor",
     "data-format",
