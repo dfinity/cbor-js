@@ -15,9 +15,12 @@ jobs:
     environment:
       name: npm
       url: https://www.npmjs.com/package/@dfinity/cbor
+    permissions:
+      contents: write
+      id-token: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Python
         uses: dfinity/ci-tools/actions/setup-python@main
@@ -42,7 +45,6 @@ jobs:
         id: publish
         uses: dfinity/ci-tools/actions/npm-publish@main
         with:
-          token: ${{ secrets.NPM_ACCESS_TOKEN }}
           is_beta: ${{ steps.is_beta.outputs.is_beta_tag }}
 
       - name: Create Github release
