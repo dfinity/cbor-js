@@ -255,6 +255,48 @@ describe('encode', () => {
     expect(bytesToHexString(results[1])).toEqual('A2616303616404'); // { "c": 3, "d": 4 }
     expect(bytesToHexString(results[2])).toEqual('A2616505616606'); // { "e": 5, "f": 6 }
   });
+
+  it('should handle Uint8Array with non-zero byteOffset', () => {
+    // Create a larger buffer and take a view at an offset
+    const largeBuffer = new ArrayBuffer(10);
+    const view = new Uint8Array(largeBuffer, 5, 3);
+    view[0] = 1;
+    view[1] = 2;
+    view[2] = 3;
+
+    const result = encode(view);
+
+    expect(bytesToHexString(result)).toEqual('43010203'); // byte string [1, 2, 3]
+  });
+
+  it('should handle encoding large data that triggers buffer resizing', () => {
+    // Create a large string that will trigger buffer resizing in encode
+    const largeString = new Array(5000).fill('a').join('');
+    const result = encode(largeString);
+
+    // Should not throw RangeError and should produce valid CBOR
+    expect(result).toBeInstanceOf(Uint8Array);
+    expect(result.length).toBeGreaterThan(5000);
+  });
+
+  it('should handle nested objects with offset Uint8Array views', () => {
+    const buffer = new ArrayBuffer(20);
+    const view1 = new Uint8Array(buffer, 0, 5);
+    const view2 = new Uint8Array(buffer, 10, 5);
+    view1.set([1, 2, 3, 4, 5]);
+    view2.set([6, 7, 8, 9, 10]);
+
+    const value = {
+      first: view1,
+      second: view2,
+    };
+
+    const result = encode(value);
+
+    expect(bytesToHexString(result)).toEqual(
+      'A2656669727374450102030405667365636F6E6445060708090A',
+    ); // { "first": [1,2,3,4,5], "second": [6,7,8,9,10] }
+  });
 });
 
 describe('encodeWithSelfDescribedTag', () => {

@@ -27,7 +27,11 @@ function encodeMajorType(majorType: CborMajorType): number {
 }
 
 let target: Uint8Array<ArrayBufferLike> = new Uint8Array(INITIAL_BUFFER_SIZE);
-let targetView = new DataView(target.buffer);
+let targetView = new DataView(
+  target.buffer,
+  target.byteOffset,
+  target.byteLength,
+);
 let bytesOffset = 0;
 let mapEntries: [string, CborValue][] = [];
 
@@ -100,7 +104,11 @@ export function encodeWithSelfDescribedTag<T = any>(
 function encodeItem(item: CborValue, replacer?: Replacer): void {
   if (bytesOffset > target.length - SAFE_BUFFER_END_OFFSET) {
     target = resizeUint8Array(target, target.length * 2);
-    targetView = new DataView(target.buffer);
+    targetView = new DataView(
+      target.buffer,
+      target.byteOffset,
+      target.byteLength,
+    );
   }
 
   if (item === false || item === true || item === null || item === undefined) {
@@ -241,7 +249,11 @@ function encodeBytes(majorType: CborMajorType, value: Uint8Array): void {
 
   if (bytesOffset > target.length - value.length) {
     target = resizeUint8Array(target, target.length + value.length);
-    targetView = new DataView(target.buffer);
+    targetView = new DataView(
+      target.buffer,
+      target.byteOffset,
+      target.byteLength,
+    );
   }
   target.set(value, bytesOffset);
   bytesOffset += value.length;
