@@ -22,7 +22,7 @@ function decodeInfo(firstByte: number): number {
   return firstByte & 0b0001_1111;
 }
 
-let cborBytes = new Uint8Array();
+let cborBytes: Uint8Array<ArrayBufferLike> = new Uint8Array();
 let dataView: DataView | undefined;
 let bytesOffset = 0;
 

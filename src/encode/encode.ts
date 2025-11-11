@@ -26,7 +26,7 @@ function encodeMajorType(majorType: CborMajorType): number {
   return majorType << 5;
 }
 
-let target = new Uint8Array(INITIAL_BUFFER_SIZE);
+let target: Uint8Array<ArrayBufferLike> = new Uint8Array(INITIAL_BUFFER_SIZE);
 let targetView = new DataView(
   target.buffer,
   target.byteOffset,
