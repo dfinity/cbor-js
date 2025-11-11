@@ -4,6 +4,10 @@
 
 - set environment in create_release_pr (#46)
 
+### Refactor
+
+- update dev dependencies (#53)
+
 ## 0.2.2 (2025-06-17)
 
 ### Fix
