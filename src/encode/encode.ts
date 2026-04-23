@@ -97,12 +97,16 @@ export function encodeWithSelfDescribedTag<T = any>(
   return target.slice(0, bytesOffset);
 }
 
-function encodeItem(item: CborValue, replacer?: Replacer): void {
-  if (bytesOffset > target.length - SAFE_BUFFER_END_OFFSET) {
-    target = resizeUint8Array(target, target.length * 2);
-    targetView = new DataView(target.buffer);
+function growBuffer(minSize: number): void {
+  let newSize = target.length * 2;
+  while (newSize < minSize) {
+    newSize *= 2;
   }
+  target = resizeUint8Array(target, newSize);
+  targetView = new DataView(target.buffer);
+}
 
+function encodeItem(item: CborValue, replacer?: Replacer): void {
   if (item === false || item === true || item === null || item === undefined) {
     encodeSimple(item);
     return;
@@ -161,6 +165,10 @@ function encodeMap(map: CborMap, replacer?: Replacer): void {
 }
 
 function encodeHeader(majorType: CborMajorType, value: CborNumber): void {
+  if (bytesOffset > target.length - SAFE_BUFFER_END_OFFSET) {
+    growBuffer(bytesOffset + SAFE_BUFFER_END_OFFSET);
+  }
+
   if (value <= TOKEN_VALUE_MAX) {
     targetView.setUint8(
       bytesOffset++,
@@ -240,8 +248,7 @@ function encodeBytes(majorType: CborMajorType, value: Uint8Array): void {
   encodeHeader(majorType, value.length);
 
   if (bytesOffset > target.length - value.length) {
-    target = resizeUint8Array(target, target.length + value.length);
-    targetView = new DataView(target.buffer);
+    growBuffer(bytesOffset + value.length);
   }
   target.set(value, bytesOffset);
   bytesOffset += value.length;
