@@ -4,10 +4,6 @@
     "module": "ESNext",
     "moduleResolution": "bundler"
   },
-  "include": [
-    "./src/**/*",
-    "./src/benchmarks/**/*",
-    "./src/**/*.spec.ts"
-  ],
+  "include": ["./src/**/*", "./src/benchmarks/**/*", "./src/**/*.spec.ts"],
   "exclude": []
 }

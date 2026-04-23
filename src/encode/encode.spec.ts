@@ -396,7 +396,10 @@ describe('encoder buffer overflow (upstream @dfinity/cbor bug)', () => {
     const payload = { a: new Uint8Array(2042), b: 'x' };
 
     expect(() => freshEncode(payload)).not.toThrow();
-    const decoded = freshDecode(freshEncode(payload)) as { a: Uint8Array; b: string };
+    const decoded = freshDecode(freshEncode(payload)) as {
+      a: Uint8Array;
+      b: string;
+    };
     expect(decoded.b).toBe('x');
     expect(decoded.a.byteLength).toBe(2042);
   });
@@ -426,10 +429,9 @@ describe('encoder buffer overflow (upstream @dfinity/cbor bug)', () => {
     };
 
     expect(() => freshEncodeWithSelfDescribedTag(envelope)).not.toThrow();
-    const decoded = freshDecode(freshEncodeWithSelfDescribedTag(envelope)) as Record<
-      string,
-      unknown
-    >;
+    const decoded = freshDecode(
+      freshEncodeWithSelfDescribedTag(envelope),
+    ) as Record<string, unknown>;
     expect(decoded).toHaveProperty('content');
     expect(decoded).toHaveProperty('sender_sig');
     expect(decoded).toHaveProperty('sender_delegation');
