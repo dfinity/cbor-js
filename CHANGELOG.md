@@ -2,7 +2,7 @@
 
 ### Fix
 
-- set environment in create_release_pr (#46)
+- fix encoder buffer overflow when a map value fills the initial 2 KB buffer exactly (#59)
 
 ### Refactor
 
