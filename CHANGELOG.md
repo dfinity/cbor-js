@@ -1,8 +1,9 @@
-## Unreleased
+## 0.3.0 (2026-04-23)
 
 ### Fix
 
-- fix encoder buffer overflow when a map value fills the initial 2 KB buffer exactly (#59)
+- encoder out of bounds (#59)
+- set environment in create_release_pr (#46)
 
 ### Refactor
 
