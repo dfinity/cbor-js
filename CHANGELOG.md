@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.2.3 (2026-04-23)
+
 ### Fix
 
 - fix encoder buffer overflow when a map value fills the initial 2 KB buffer exactly (#59)
