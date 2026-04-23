@@ -1,5 +1,6 @@
-import { it, describe, expect } from 'vitest';
+import { it, describe, expect, test, vi, beforeEach } from 'vitest';
 import { encode, Replacer, encodeWithSelfDescribedTag } from './encode';
+import { decode } from '../decode/decode';
 import { CborValue } from '../cbor-value';
 
 function bytesToHexArray(arrayBuffer: Uint8Array): string[] {
@@ -344,5 +345,94 @@ describe('encodeWithSelfDescribedTag', () => {
     expect(bytesToHexString(results[0])).toEqual('D9D9F7A2616101616202'); // { "a": 1, "b": 2 } with self-described tag
     expect(bytesToHexString(results[1])).toEqual('D9D9F7A2616303616404'); // { "c": 3, "d": 4 } with self-described tag
     expect(bytesToHexString(results[2])).toEqual('D9D9F7A2616505616606'); // { "e": 5, "f": 6 } with self-described tag
+  });
+});
+
+// Regression: encoder throws "DataView setUint8 offset out of bounds"
+// when a map value fills the 2KB buffer exactly, because the next key's
+// encodeTextString → encodeHeader has no bounds check.
+//
+// Byte layout for encodeWithSelfDescribedTag({ a: Uint8Array(2039), b: 'x' }):
+//   Tag 55799:        3 bytes  → s = 3
+//   Map(2):           1 byte   → s = 4
+//   TextString "a":   2 bytes  → s = 6
+//   ByteString(2039): 3 + 2039 → s = 2048 (= initial buffer length)
+//   TextString "b":   encodeHeader calls setUint8(2048, ...) → RangeError
+//
+// The encoder's internal buffer is module-level state that grows but never
+// shrinks. Earlier tests (e.g. 16 MB string) expand it well past 2 KB, masking
+// this bug. Each test below resets the module registry so it gets a fresh 2 KB
+// buffer.
+describe('encoder buffer overflow (upstream @dfinity/cbor bug)', () => {
+  let freshEncode: typeof encode;
+  let freshEncodeWithSelfDescribedTag: typeof encodeWithSelfDescribedTag;
+  let freshDecode: typeof decode;
+
+  beforeEach(async () => {
+    vi.resetModules();
+    const enc = await import('./encode');
+    const dec = await import('../decode/decode');
+    freshEncode = enc.encode;
+    freshEncodeWithSelfDescribedTag = enc.encodeWithSelfDescribedTag;
+    freshDecode = dec.decode;
+  });
+
+  test('encodeWithSelfDescribedTag: value exactly fills 2KB buffer', () => {
+    const payload = { a: new Uint8Array(2039), b: 'x' };
+
+    expect(() => freshEncodeWithSelfDescribedTag(payload)).not.toThrow();
+    const decoded = freshDecode(freshEncodeWithSelfDescribedTag(payload)) as {
+      a: Uint8Array;
+      b: string;
+    };
+    expect(decoded.b).toBe('x');
+    expect(decoded.a.byteLength).toBe(2039);
+  });
+
+  test('encode (no self-described tag): value exactly fills 2KB buffer', () => {
+    // Without the 3-byte tag prefix, the boundary shifts:
+    //   Map(2): 1 byte → s = 1, TextString "a": 2 bytes → s = 3,
+    //   ByteString(2042): 3 + 2042 → s = 2048
+    const payload = { a: new Uint8Array(2042), b: 'x' };
+
+    expect(() => freshEncode(payload)).not.toThrow();
+    const decoded = freshDecode(freshEncode(payload)) as { a: Uint8Array; b: string };
+    expect(decoded.b).toBe('x');
+    expect(decoded.a.byteLength).toBe(2042);
+  });
+
+  test('envelope-shaped payload with large arg and delegation', () => {
+    const envelope = {
+      content: {
+        request_type: 'call',
+        canister_id: new Uint8Array(10),
+        method_name: 'manage_neuron',
+        arg: new Uint8Array(1961),
+        sender: new Uint8Array(29),
+        ingress_expiry: BigInt('0x17E83B35D5A00000'),
+        nonce: new Uint8Array(16),
+      },
+      sender_sig: new Uint8Array(64),
+      sender_delegation: [
+        {
+          delegation: {
+            pubkey: new Uint8Array(93),
+            expiration: BigInt('0x17E83B35D5A00000'),
+          },
+          signature: new Uint8Array(1251),
+        },
+      ],
+      sender_pubkey: new Uint8Array(62),
+    };
+
+    expect(() => freshEncodeWithSelfDescribedTag(envelope)).not.toThrow();
+    const decoded = freshDecode(freshEncodeWithSelfDescribedTag(envelope)) as Record<
+      string,
+      unknown
+    >;
+    expect(decoded).toHaveProperty('content');
+    expect(decoded).toHaveProperty('sender_sig');
+    expect(decoded).toHaveProperty('sender_delegation');
+    expect(decoded).toHaveProperty('sender_pubkey');
   });
 });
