@@ -387,6 +387,45 @@ describe('decode', () => {
     });
   });
 
+  describe('map keys named __proto__', () => {
+    // "__proto__" as a CBOR text string: 0x69 (text, length 9) followed by the UTF-8 bytes.
+    const PROTO_KEY = '695F5F70726F746F5F5F';
+
+    it.each([
+      { label: 'definite-length map', bytes: `A1${PROTO_KEY}80` }, // { "__proto__": [] }
+      { label: 'indefinite-length map', bytes: `BF${PROTO_KEY}80FF` }, // { "__proto__": [] }
+    ])('decodes "__proto__" as an own property in a $label', ({ bytes }) => {
+      const result = decodeBytes(bytes) as Record<string, CborValue>;
+
+      expect(Object.getPrototypeOf(result)).toBe(Object.prototype);
+      expect(Object.keys(result)).toEqual(['__proto__']);
+      expect(Object.getOwnPropertyDescriptor(result, '__proto__')).toEqual({
+        value: [],
+        writable: true,
+        enumerable: true,
+        configurable: true,
+      });
+    });
+
+    it('does not let a map masquerade as an array', () => {
+      // { "0": 1, "__proto__": [] }: with the prototype swapped, this would have an inherited
+      // `length` of 0 and an inherited array iterator yielding nothing, despite holding a "0" key.
+      const result = decodeBytes(`A2613001${PROTO_KEY}80`);
+
+      expect(Array.isArray(result)).toBe(false);
+      expect(result).not.toBeInstanceOf(Array);
+      expect(Symbol.iterator in (result as object)).toBe(false);
+      expect((result as { length?: unknown }).length).toBeUndefined();
+    });
+
+    it('does not modify Object.prototype', () => {
+      // { "__proto__": { "polluted": true } }
+      decodeBytes(`A1${PROTO_KEY}A168706F6C6C75746564F5`);
+
+      expect(({} as { polluted?: unknown }).polluted).toBeUndefined();
+    });
+  });
+
   it('should decode concurrently', async () => {
     const values = [
       'A2616101616202', // { "a": 1, "b": 2 }

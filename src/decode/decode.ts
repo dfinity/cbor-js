@@ -173,7 +173,7 @@ function decodeMap(info: number, reviver?: Reviver): CborMap {
     ) {
       const key = decodeTextString(info);
       const decodedItem = decodeItem(reviver);
-      map[key] = reviver?.(decodedItem, key) ?? decodedItem;
+      setMapEntry(map, key, reviver?.(decodedItem, key) ?? decodedItem);
 
       [majorType, info] = decodeNextByte();
     }
@@ -190,10 +190,32 @@ function decodeMap(info: number, reviver?: Reviver): CborMap {
 
     const key = decodeTextString(info);
     const decodedItem = decodeItem(reviver);
-    map[key] = reviver?.(decodedItem, key) ?? decodedItem;
+    setMapEntry(map, key, reviver?.(decodedItem, key) ?? decodedItem);
   }
 
   return map;
+}
+
+/**
+ * Stores a decoded map entry as an own data property, the same way `JSON.parse` does.
+ *
+ * A plain assignment `map['__proto__'] = value` would invoke the inherited
+ * `Object.prototype.__proto__` setter and replace the map's prototype instead
+ * of storing the entry, letting untrusted input turn a decoded map into, for
+ * example, something that passes `instanceof Array` and inherits array methods.
+ */
+function setMapEntry(map: CborMap, key: string, value: CborValue): void {
+  if (key === '__proto__') {
+    Object.defineProperty(map, key, {
+      value,
+      writable: true,
+      enumerable: true,
+      configurable: true,
+    });
+    return;
+  }
+
+  map[key] = value;
 }
 
 function decodeUnsignedInteger(info: number): CborNumber {
