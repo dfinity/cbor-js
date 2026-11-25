@@ -1,4 +1,8 @@
-## Unreleased
+## 0.2.4 (2026-11-24)
+
+### Fix
+
+- decode `__proto__` map keys as own properties (#66)
 
 ## 0.2.3 (2026-04-23)
 
